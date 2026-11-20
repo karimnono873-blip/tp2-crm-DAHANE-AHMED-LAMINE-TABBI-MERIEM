@@ -1,0 +1,1846 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP N°02 CRM : Modèle Géométrique Direct et Inverse | USTHB — M1 AII</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Strictly Academic & Engineering Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- KaTeX v0.16.9 for Crisp Publication-Grade LaTeX Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                        display: ['"Outfit"', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        obsidian: {
+                            950: '#070913',
+                            900: '#0d1324',
+                            850: '#131c33',
+                            800: '#1e293b',
+                        },
+                        accent: {
+                            blue: '#3b82f6',
+                            cyan: '#38bdf8',
+                            violet: '#8b5cf6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #070913;
+            color: #e2e8f0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-image:
+                radial-gradient(circle at 10% 10%, rgba(59, 130, 246, 0.12), transparent 35%),
+                radial-gradient(circle at 90% 15%, rgba(139, 92, 246, 0.12), transparent 35%),
+                radial-gradient(circle at 50% 85%, rgba(56, 189, 248, 0.08), transparent 45%);
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        /* Google Pixel Astronomical Obsidian Glassmorphic Cards */
+        .glass-card {
+            background: rgba(17, 25, 45, 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-radius: 1rem;
+            box-shadow: 0 12px 32px -12px rgba(2, 6, 23, 0.78);
+        }
+
+        .glass-card-elevated {
+            background: rgba(22, 32, 56, 0.86);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(56, 189, 248, 0.22);
+            border-radius: 1rem;
+            box-shadow: 0 16px 40px -12px rgba(2, 6, 23, 0.88);
+        }
+
+        .handout-paper {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.92) 0%, rgba(11, 17, 32, 0.96) 100%);
+            border: 1px solid rgba(96, 165, 250, 0.24);
+            border-radius: 0.875rem;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 25px -10px rgba(0, 0, 0, 0.65);
+        }
+
+        .btn-primary {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.8125rem;
+            letter-spacing: 0.015em;
+            border: 1px solid rgba(96, 165, 250, 0.4);
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            color: #ffffff;
+            border-radius: 0.65rem;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.38);
+            border-color: rgba(167, 139, 250, 0.7);
+        }
+
+        .nav-pill {
+            transition: all 0.18s ease;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            background: rgba(15, 23, 42, 0.7);
+        }
+
+        .nav-pill:hover {
+            border-color: rgba(56, 189, 248, 0.5);
+            color: #ffffff;
+            background: rgba(22, 32, 56, 0.92);
+        }
+
+        .nav-pill-active {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(139, 92, 246, 0.28) 100%) !important;
+            border-color: rgba(56, 189, 248, 0.65) !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 12px rgba(56, 189, 248, 0.18);
+        }
+
+        /* KaTeX Dark Mode Polish */
+        .katex {
+            font-size: 1.03em;
+            color: #f8fafc;
+        }
+        .katex-display {
+            margin: 0.65rem 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.25rem 0;
+        }
+
+        /* Range Slider Styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: #1e293b;
+            border-radius: 999px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #38bdf8;
+            border: 2px solid #070913;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.65);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 7px;
+            height: 7px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070913;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6;
+        }
+
+        /* Clean Export PDF / Print Media Rules */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            header {
+                position: static !important;
+                background: #070913 !important;
+            }
+            body {
+                background: #070913 !important;
+                color: #f1f5f9 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .glass-card, .glass-card-elevated, .handout-paper {
+                background: #0d1324 !important;
+                backdrop-filter: none !important;
+                box-shadow: none !important;
+                border: 1px solid #334155 !important;
+                break-inside: avoid;
+            }
+            section {
+                page-break-before: always;
+            }
+            section:first-of-type {
+                page-break-before: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-blue-500/30 selection:text-cyan-200">
+
+    <!-- STICKY TOP ACADEMIC BAR -->
+    <header class="sticky top-0 z-50 border-b border-slate-800/80 bg-[#070913]/90 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+            <!-- Left: USTHB & Module Identity -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600/30 via-cyan-500/20 to-violet-600/30 border border-cyan-400/40 flex items-center justify-center shadow-lg shadow-blue-950/50">
+                    <!-- Clean Vector Open-Chain Manipulator SVG -->
+                    <svg class="w-6 h-6 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <rect x="3" y="18" width="6" height="3" rx="1" class="fill-blue-500/30"/>
+                        <circle cx="6" cy="16" r="2" class="fill-cyan-500/30"/>
+                        <path d="M7.5 14.5L13 9" stroke-linecap="round"/>
+                        <circle cx="14.5" cy="7.5" r="2" class="fill-violet-500/30"/>
+                        <path d="M16.2 6.5L20 4.5" stroke-linecap="round"/>
+                        <path d="M19 3L21.5 4L20.5 6.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="px-2 py-0.5 text-[11px] font-mono font-semibold uppercase tracking-wider rounded-md bg-blue-500/15 text-cyan-300 border border-cyan-500/30">USTHB • FGE</span>
+                        <span class="px-2 py-0.5 text-[11px] font-mono font-semibold uppercase tracking-wider rounded-md bg-violet-500/15 text-violet-300 border border-violet-500/30">M1 AII</span>
+                        <span class="hidden sm:inline-block text-xs text-slate-400 font-mono">TP N°02 — TP Commande du robot manipulateur</span>
+                    </div>
+                    <h1 class="font-display font-bold text-sm sm:text-base text-white tracking-tight mt-0.5">
+                        Programmation d'un Modèle Géométrique Direct (MGD) et Inverse (MGI)
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Right: Quick Jump Navigation & Print Button -->
+            <div class="flex items-center gap-1.5 flex-wrap no-print">
+                <a href="#page-1" class="nav-pill px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300">Page 1 • Chaîne Ouverte</a>
+                <a href="#page-2" class="nav-pill px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300">Page 2 • Paramètres DH</a>
+                <a href="#page-3" class="nav-pill px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300">Page 3 • MGD &amp; MGI</a>
+                <a href="#simulateur" class="nav-pill nav-pill-active px-2.5 py-1.5 rounded-lg text-xs font-medium">Simulateur Interactif</a>
+                <a href="#matlab-script" class="nav-pill px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300">Script MATLAB</a>
+                <button onclick="window.print()" class="btn-primary px-3 py-1.5 flex items-center gap-1.5 ml-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                    </svg>
+                    <span>Imprimer / Exporter en PDF</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN ACADEMIC CONTAINER -->
+    <main class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- HERO ACADEMIC BANNER -->
+        <div class="glass-card-elevated p-6 sm:p-8 relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-24 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center relative z-10">
+                <div class="lg:col-span-8 space-y-3">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-cyan-400/30 text-cyan-300 text-xs font-mono">
+                        <span>Université des Sciences et de la Technologie Houari Boumediene (USTHB)</span>
+                    </div>
+                    <h2 class="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                        TP N° 02 : <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400">Programmation d'un Modèle Géométrique Direct et Inverse</span>
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed max-w-3xl">
+                        Compte-rendu complet et implémentation sous <strong>MATLAB</strong> du formalisme géométrique des robots à structure ouverte simple (conventions de Denavit-Hartenberg modifiées / Khalil-Kleinfinger) : développement de la fonction générique <code>MGD_gen</code>, validation numérique sur le <strong>manipulateur cylindrique 3-DDL</strong>, résolution analytique et programmation de <code>MGI_RR</code> pour le <strong>robot planaire à 2 DDL</strong>.
+                    </p>
+                </div>
+
+                <!-- Metadata Card -->
+                <div class="lg:col-span-4 bg-slate-950/70 border border-slate-800/90 rounded-xl p-4 space-y-2.5 text-xs font-mono">
+                    <div class="flex justify-between items-center py-1 border-b border-slate-800/80">
+                        <span class="text-slate-400">Faculté / Dépt :</span>
+                        <span class="text-slate-200 font-semibold">FGE — Automatique</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b border-slate-800/80">
+                        <span class="text-slate-400">Spécialité &amp; Niveau :</span>
+                        <span class="text-cyan-300 font-semibold">Automatique — M1 AII</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b border-slate-800/80">
+                        <span class="text-slate-400">Module :</span>
+                        <span class="text-slate-200 font-semibold">TP Commande du robot</span>
+                    </div>
+                    <div class="flex justify-between items-center py-1 border-b border-slate-800/80">
+                        <span class="text-slate-400">Encadrante :</span>
+                        <span class="text-violet-300 font-semibold">Pr. MENANI</span>
+                    </div>
+                    <div class="pt-1">
+                        <span class="text-slate-400 block mb-1">Réalisé par :</span>
+                        <div class="bg-gradient-to-r from-blue-500/15 to-violet-500/15 border border-cyan-500/30 rounded-lg px-3 py-2 text-white font-sans font-semibold text-sm flex items-center justify-center">
+                            <span>Dahane Ahmed Lamine</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===================================================================
+             PAGE 1 : ARCHITECTURE DES ROBOTS À CHAÎNE OUVERTE & REPÈRES
+        ==================================================================== -->
+        <section id="page-1" class="scroll-mt-20 space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-lg bg-blue-600/20 border border-blue-400/40 font-mono text-xs font-bold text-cyan-300">PAGE 1 / 3</span>
+                    <h2 class="font-display text-xl sm:text-2xl font-bold text-white">Architecture des Robots à Chaîne Ouverte &amp; Conventions de Repères</h2>
+                </div>
+                <span class="text-xs font-mono text-slate-400 hidden md:inline">USTHB / FGE • TP CRM • M1 AII • MENANI 1</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- LEFT COLUMN: FAITHFUL REPRODUCTION OF PAGE 1 HANDOUT -->
+                <div class="lg:col-span-5 handout-paper p-5 sm:p-6 space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <span class="text-[11px] font-mono uppercase tracking-wider text-cyan-400 font-semibold">Énoncé Original &amp; Schéma (Page 1)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono text-[10px]">Polycopié TP N°2</span>
+                    </div>
+
+                    <div class="text-xs text-slate-300 space-y-1 font-mono bg-slate-950/60 p-3 rounded-lg border border-slate-800/80 leading-relaxed">
+                        <div>Université des Sciences et de la Technologie HOUARI BOUMEDIENE - USTHB -</div>
+                        <div>Faculté de Génie Électrique FGE — Département d'Automatique</div>
+                        <div>Spécialité : Automatique | Niveau : M1 AII</div>
+                        <div>Module : TP Commande du robot manipulateur — <strong class="text-cyan-300">TP N° 2</strong></div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h3 class="font-display font-bold text-sm text-cyan-300 uppercase tracking-wider">1. Objectif du TP</h3>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Le but de ce TP est de programmer des fonctions sous MATLAB qui permettent de calculer le modèle géométrique direct (MGD) et le modèle géométrique inverse (MGI) d'un manipulateur.
+                        </p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="font-display font-bold text-sm text-violet-300 uppercase tracking-wider">2. Rappel théorique</h3>
+                        <h4 class="font-display font-semibold text-xs sm:text-sm text-slate-200">2.1 Description de la géométrie des robots à structure ouverte simple</h4>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            La conception et commande des robots nécessitent le calcul de certains modèles mathématiques, tels que :
+                        </p>
+                        <ul class="text-xs sm:text-sm text-slate-300 space-y-1.5 list-disc list-inside leading-relaxed">
+                            <li>Les modèles de transformation entre l'espace opérationnel (dans lequel est définie la situation de l'organe terminal) et l'espace articulaire (dans lequel est définie la configuration du robot), on distingue :
+                                <div class="pl-4 pt-1 text-cyan-200/90">
+                                    * Les modèles géométriques direct et inverse qui expriment la situation de l'organe terminal en fonction des variables articulaires du mécanisme et inversement.
+                                </div>
+                            </li>
+                        </ul>
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Le corps \(C_0\) désigne la base du robot et le corps \(C_n\), le corps qui porte l'organe terminal. L'articulation \(j\) connecte le corps \(C_j\) au corps \(C_{j-1}\) (figure 1). La méthode de description est fondée sur les règles et conventions suivantes :
+                        </p>
+                        <ul class="text-xs text-slate-300 space-y-1 list-disc list-inside">
+                            <li>Les corps sont supposés parfaitement rigides, connectés par des articulations considérées comme idéales (sans jeu mécanique), soit rotoïdes, soit prismatiques.</li>
+                            <li>Le repère \(R_j\) est lié au corps \(C_j\).</li>
+                            <li>La variable de l'articulation \(j\) est notée \(q_j\).</li>
+                        </ul>
+
+                        <!-- High-Precision Vector SVG of Figure 1: Robot à structure ouverte simple -->
+                        <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3">
+                            <svg viewBox="0 0 420 250" class="w-full h-auto">
+                                <!-- Ground Hatching -->
+                                <line x1="25" y1="215" x2="105" y2="215" stroke="#e2e8f0" stroke-width="2.2"/>
+                                <g stroke="#64748b" stroke-width="1.5">
+                                    <line x1="35" y1="215" x2="27" y2="226"/>
+                                    <line x1="50" y1="215" x2="42" y2="226"/>
+                                    <line x1="65" y1="215" x2="57" y2="226"/>
+                                    <line x1="80" y1="215" x2="72" y2="226"/>
+                                    <line x1="95" y1="215" x2="87" y2="226"/>
+                                </g>
+
+                                <!-- Base C0 -->
+                                <path d="M 38 215 L 38 182 A 27 22 0 0 1 92 182 L 92 215 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="1.8"/>
+                                <text x="55" y="198" fill="#f8fafc" font-family="Plus Jakarta Sans" font-size="14" font-weight="bold">C₀</text>
+
+                                <!-- Joint 1 -->
+                                <circle cx="66" cy="154" r="7" fill="#0f172a" stroke="#38bdf8" stroke-width="1.8"/>
+                                <text x="78" y="158" fill="#38bdf8" font-family="JetBrains Mono" font-size="10">q₁</text>
+
+                                <!-- Link C1 -->
+                                <ellipse cx="76" cy="122" rx="16" ry="27" transform="rotate(14 76 122)" fill="#131c33" stroke="#cbd5e1" stroke-width="1.6"/>
+                                <text x="66" y="126" fill="#f8fafc" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold">C₁</text>
+
+                                <!-- Joint 2 -->
+                                <circle cx="88" cy="90" r="7" fill="#0f172a" stroke="#38bdf8" stroke-width="1.8"/>
+                                <text x="100" y="95" fill="#38bdf8" font-family="JetBrains Mono" font-size="10">q₂</text>
+
+                                <!-- Link C2 -->
+                                <ellipse cx="110" cy="64" rx="15" ry="26" transform="rotate(36 110 64)" fill="#131c33" stroke="#cbd5e1" stroke-width="1.6"/>
+                                <text x="100" y="68" fill="#f8fafc" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold">C₂</text>
+
+                                <!-- Joint 3 -->
+                                <circle cx="131" cy="41" r="7" fill="#0f172a" stroke="#38bdf8" stroke-width="1.8"/>
+                                <text x="142" y="48" fill="#38bdf8" font-family="JetBrains Mono" font-size="10">q₃</text>
+
+                                <!-- Link C3 -->
+                                <ellipse cx="162" cy="28" rx="14" ry="26" transform="rotate(64 162 28)" fill="#131c33" stroke="#cbd5e1" stroke-width="1.6"/>
+                                <text x="152" y="32" fill="#f8fafc" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold">C₃</text>
+
+                                <!-- Joint 4 -->
+                                <circle cx="192" cy="18" r="6" fill="#0f172a" stroke="#8b5cf6" stroke-width="1.6"/>
+
+                                <!-- Dotted kinematic continuation -->
+                                <path d="M 199 16 Q 232 6 266 18" fill="none" stroke="#94a3b8" stroke-width="1.8" stroke-dasharray="3 3"/>
+
+                                <!-- Joint n -->
+                                <circle cx="272" cy="21" r="7" fill="#0f172a" stroke="#8b5cf6" stroke-width="1.8"/>
+                                <text x="266" y="40" fill="#c4b5fd" font-family="JetBrains Mono" font-size="10">qₙ</text>
+
+                                <!-- Link Cn -->
+                                <ellipse cx="310" cy="34" rx="15" ry="32" transform="rotate(110 310 34)" fill="#131c33" stroke="#8b5cf6" stroke-width="1.8"/>
+                                <text x="301" y="38" fill="#f8fafc" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold">Cₙ</text>
+
+                                <!-- End-Effector Gripper -->
+                                <line x1="340" y1="45" x2="375" y2="62" stroke="#38bdf8" stroke-width="2.2"/>
+                                <line x1="367" y1="77" x2="383" y2="47" stroke="#38bdf8" stroke-width="2.2"/>
+                                <line x1="367" y1="77" x2="388" y2="87" stroke="#38bdf8" stroke-width="2.2"/>
+                                <line x1="383" y1="47" x2="404" y2="57" stroke="#38bdf8" stroke-width="2.2"/>
+
+                                <text x="105" y="242" fill="#94a3b8" font-family="Plus Jakarta Sans" font-size="12" font-weight="600">Figure 1 : Robot à structure ouverte simple.</text>
+                            </svg>
+                        </div>
+
+                        <div class="bg-slate-950/70 border border-blue-500/30 rounded-lg p-3 text-xs sm:text-sm text-slate-200">
+                            <p class="font-semibold text-cyan-300 mb-1">Le repère \(R_j\), fixé au corps \(C_j\), est défini de sorte que :</p>
+                            <div class="flex items-start gap-2">
+                                <span class="text-cyan-400 font-bold">■</span>
+                                <span>L'axe \(Z_j\) est porté par l'axe de l'articulation \(j\).</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: ARCHITECTURAL & KINEMATIC ANALYSIS OF PAGE 1 -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="glass-card p-6 space-y-5">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+                                <h3 class="font-display font-bold text-base sm:text-lg text-white">Analyse Cinématique &amp; Conventions de Repérage (Khalil-Kleinfinger)</h3>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 font-mono text-xs">Fondements • Page 1</span>
+                        </div>
+
+                        <div class="space-y-4 text-sm text-slate-300 leading-relaxed">
+                            <p>
+                                Un robot manipulateur à <strong>chaîne cinématique ouverte simple</strong> est constitué d'une succession sérielle de \(n + 1\) corps rigides \(C_0, C_1, \dots, C_n\) reliés par \(n\) articulations motorisées à 1 degré de liberté chacune (\(1, 2, \dots, n\)), sans aucune boucle fermée.
+                            </p>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="bg-slate-900/80 border border-blue-500/25 rounded-xl p-4 space-y-2">
+                                    <div class="text-xs font-mono uppercase text-cyan-400 font-semibold">1. Modèle Géométrique Direct (MGD)</div>
+                                    <p class="text-xs text-slate-300 leading-relaxed">
+                                        Il permet de calculer la situation (position + orientation) de l'organe terminal dans le repère de référence \(\mathcal{R}_0\) à partir des \(n\) variables articulaires \(q = [q_1, q_2, \dots, q_n]^T\) :
+                                    </p>
+                                    <div class="bg-slate-950/80 rounded-lg p-2.5 text-center">
+                                        $$X = f(q) \quad \Longleftrightarrow \quad {^0T_n}(q) = {^0T_1}(q_1)\,{^1T_2}(q_2)\cdots{^{n-1}T_n}(q_n)$$
+                                    </div>
+                                    <p class="text-[11px] text-slate-400">
+                                        La matrice \({^0T_n}(q) \in SE(3)\) est toujours <strong>unique</strong> pour une configuration articulaire donnée.
+                                    </p>
+                                </div>
+
+                                <div class="bg-slate-900/80 border border-violet-500/25 rounded-xl p-4 space-y-2">
+                                    <div class="text-xs font-mono uppercase text-violet-400 font-semibold">2. Modèle Géométrique Inverse (MGI)</div>
+                                    <p class="text-xs text-slate-300 leading-relaxed">
+                                        Il résout le problème réciproque indispensable à la génération de trajectoire : déterminer les consignes articulaires \(q\) réalisant une pose désirée \(X_d\) de l'effecteur :
+                                    </p>
+                                    <div class="bg-slate-950/80 rounded-lg p-2.5 text-center">
+                                        $$q = f^{-1}(X_d)$$
+                                    </div>
+                                    <p class="text-[11px] text-slate-400">
+                                        Contrairement au MGD, le MGI est non-linéaire et peut admettre <strong>0 solution</strong> (hors espace de travail), une <strong>infinité</strong> (singularités / redondance) ou <strong>plusieurs postures</strong> (coude haut / coude bas).
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Convention DH modifiée vs DH standard -->
+                            <div class="bg-slate-900/70 border border-slate-800 rounded-xl p-4 space-y-3">
+                                <h4 class="font-display font-semibold text-sm text-cyan-300 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Spécificité de la Convention de Khalil-Kleinfinger (DH Modifiée) utilisée dans ce TP
+                                </h4>
+                                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                                    Il est essentiel de noter que le polycopié de l'USTHB adopte la convention de <strong>Denavit-Hartenberg modifiée (Khalil-Kleinfinger)</strong>, qui se distingue de la convention DH standard par l'indexation des repères :
+                                </p>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-xs text-left border-collapse">
+                                        <thead>
+                                            <tr class="border-b border-slate-700 text-cyan-300 font-mono">
+                                                <th class="py-2 px-3">Critère</th>
+                                                <th class="py-2 px-3">Convention du TP (Khalil-Kleinfinger / DHM)</th>
+                                                <th class="py-2 px-3">Convention DH Standard (Craig / Spong)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-800 text-slate-300">
+                                            <tr>
+                                                <td class="py-2 px-3 font-semibold text-white">Attachement de \(R_j\)</td>
+                                                <td class="py-2 px-3 text-cyan-200">Fixé au corps \(C_j\) sur l'articulation \(j\)</td>
+                                                <td class="py-2 px-3 text-slate-400">Fixé au corps \(C_j\) sur l'articulation \(j+1\)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-2 px-3 font-semibold text-white">Axe \(Z_j\)</td>
+                                                <td class="py-2 px-3 text-cyan-200">Porté par l'axe de l'articulation \(j\)</td>
+                                                <td class="py-2 px-3 text-slate-400">Porté par l'axe de l'articulation \(j+1\)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-2 px-3 font-semibold text-white">Axe \(X_j\)</td>
+                                                <td class="py-2 px-3 text-cyan-200">Perpendiculaire commune à \(Z_j\) et \(Z_{j+1}\)</td>
+                                                <td class="py-2 px-3 text-slate-400">Perpendiculaire commune à \(Z_{j-1}\) et \(Z_j\)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-2 px-3 font-semibold text-white">Ordre de \({^{j-1}T_j}\)</td>
+                                                <td class="py-2 px-3 font-mono text-violet-300">\(\text{Rot}(x,\alpha_j)\text{Trans}(x,d_j)\text{Rot}(z,\theta_j)\text{Trans}(z,r_j)\)</td>
+                                                <td class="py-2 px-3 font-mono text-slate-400">\(\text{Rot}(z,\theta_j)\text{Trans}(z,r_j)\text{Trans}(x,d_j)\text{Rot}(x,\alpha_j)\)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Paramètre sigma_j -->
+                            <div class="bg-blue-950/20 border border-blue-500/30 rounded-xl p-4 space-y-2">
+                                <div class="text-xs font-mono uppercase text-blue-300 font-semibold">Codage du Type d'Articulation par le Paramètre Binaire \(\sigma_j\)</div>
+                                <p class="text-xs text-slate-300 leading-relaxed">
+                                    Chaque articulation \(j\) possède une seule variable articulaire \(q_j\) sélectionnée automatiquement par l'indicateur binaire \(\sigma_j \in \{0, 1\}\) :
+                                </p>
+                                <div class="bg-slate-950/80 rounded-lg p-3 text-center">
+                                    $$q_j = (1 - \sigma_j)\theta_j + \sigma_j r_j = \begin{cases} \theta_j & \text{si } \sigma_j = 0 \quad (\text{articulation rotoïde : } r_j = \text{cte}) \\ r_j & \text{si } \sigma_j = 1 \quad (\text{articulation prismatique : } \theta_j = \text{cte}) \end{cases}$$
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             PAGE 2 : PARAMÈTRES GÉOMÉTRIQUES & MATRICE DE TRANSFORMATION j-1_T_j
+        ==================================================================== -->
+        <section id="page-2" class="scroll-mt-20 space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-lg bg-violet-600/20 border border-violet-400/40 font-mono text-xs font-bold text-violet-300">PAGE 2 / 3</span>
+                    <h2 class="font-display text-xl sm:text-2xl font-bold text-white">Paramètres Géométriques \((\alpha_j, d_j, \theta_j, r_j)\) &amp; Matrice de Transformation \({^{j-1}T_j}\)</h2>
+                </div>
+                <span class="text-xs font-mono text-slate-400 hidden md:inline">USTHB / FGE • TP CRM • M1 AII • MENANI 2</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- LEFT COLUMN: FAITHFUL REPRODUCTION OF PAGE 2 HANDOUT -->
+                <div class="lg:col-span-5 handout-paper p-5 sm:p-6 space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <span class="text-[11px] font-mono uppercase tracking-wider text-violet-400 font-semibold">Énoncé Original &amp; Schéma (Page 2)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono text-[10px]">Page 2</span>
+                    </div>
+
+                    <div class="space-y-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        <div class="flex items-start gap-2 bg-slate-950/70 border border-slate-800 rounded-lg p-2.5 text-slate-200">
+                            <span class="text-cyan-400 font-bold">■</span>
+                            <span>L'axe \(X_j\) est porté par la perpendiculaire commune aux axes \(Z_j\) et \(Z_{j+1}\).</span>
+                        </div>
+
+                        <p>
+                            Le passage du repère \(R_{j-1}\) au repère \(R_j\) s'exprime en fonction des quatre paramètres géométriques suivants (figure 2) :
+                        </p>
+
+                        <ul class="space-y-1.5 text-xs bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
+                            <li><strong class="text-cyan-300">\(\alpha_j\) :</strong> angle entre les axes \(Z_{j-1}\) et \(Z_j\) correspondant à une rotation autour de \(X_{j-1}\).</li>
+                            <li><strong class="text-cyan-300">\(d_j\) :</strong> distance entre \(Z_{j-1}\) et \(Z_j\) le long de \(X_{j-1}\).</li>
+                            <li><strong class="text-violet-300">\(\theta_j\) :</strong> angle entre les axes \(X_{j-1}\) et \(X_j\) correspondant à une rotation autour de \(Z_j\).</li>
+                            <li><strong class="text-violet-300">\(r_j\) :</strong> distance entre \(X_{j-1}\) et \(X_j\) le long de \(Z_j\).</li>
+                        </ul>
+
+                        <!-- High-Precision Vector SVG of Figure 2: Paramètres géométriques -->
+                        <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3">
+                            <svg viewBox="0 0 420 245" class="w-full h-auto">
+                                <defs>
+                                    <marker id="arr-c" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                        <path d="M 0 1 L 9 5 L 0 9 z" fill="#38bdf8"/>
+                                    </marker>
+                                    <marker id="arr-v" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                        <path d="M 0 1 L 9 5 L 0 9 z" fill="#a78bfa"/>
+                                    </marker>
+                                    <marker id="arr-w" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                                        <path d="M 0 1 L 9 5 L 0 9 z" fill="#cbd5e1"/>
+                                    </marker>
+                                </defs>
+
+                                <!-- Frame R_{j-1} at O_{j-1} = (55, 195) -->
+                                <line x1="55" y1="195" x2="55" y2="65" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr-c)"/>
+                                <text x="20" y="72" fill="#38bdf8" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold">Zⱼ₋₁</text>
+
+                                <!-- Axis X_{j-1} angled upward-right -->
+                                <line x1="55" y1="195" x2="365" y2="112" stroke="#38bdf8" stroke-width="2" marker-end="url(#arr-c)"/>
+                                <text x="372" y="114" fill="#38bdf8" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold">Xⱼ₋₁</text>
+                                <text x="24" y="210" fill="#cbd5e1" font-family="Plus Jakarta Sans" font-size="12" font-weight="bold">Oⱼ₋₁</text>
+
+                                <!-- Right angle symbol at O_{j-1} -->
+                                <polyline points="55,178 70,174 70,191" fill="none" stroke="#94a3b8" stroke-width="1.2"/>
+
+                                <!-- Intermediate point H on X_{j-1} at (200, 156) -->
+                                <!-- Distance d_j along X_{j-1} -->
+                                <line x1="60" y1="184" x2="195" y2="148" stroke="#cbd5e1" stroke-width="1.2" stroke-dasharray="3 2" marker-start="url(#arr-w)" marker-end="url(#arr-w)"/>
+                                <text x="115" y="160" fill="#f8fafc" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">dⱼ</text>
+
+                                <!-- Axis Z_j tilted by alpha_j around X_{j-1} -->
+                                <line x1="200" y1="156" x2="148" y2="35" stroke="#a78bfa" stroke-width="2" marker-end="url(#arr-v)"/>
+                                <text x="128" y="42" fill="#c4b5fd" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold">Zⱼ</text>
+
+                                <!-- Right angle between X_{j-1} and Z_j -->
+                                <polyline points="186,160 180,146 194,142" fill="none" stroke="#94a3b8" stroke-width="1.2"/>
+
+                                <!-- Angle alpha_j between Z_{j-1} parallel and Z_j -->
+                                <line x1="200" y1="156" x2="200" y2="75" stroke="#64748b" stroke-width="1.1" stroke-dasharray="3 3"/>
+                                <path d="M 200 105 A 50 50 0 0 0 180 109" fill="none" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arr-c)"/>
+                                <text x="206" y="106" fill="#38bdf8" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">αⱼ</text>
+
+                                <!-- Origin O_j at (172, 90) along Z_j -->
+                                <circle cx="172" cy="90" r="3.5" fill="#f8fafc"/>
+                                <text x="148" y="92" fill="#f8fafc" font-family="Plus Jakarta Sans" font-size="12" font-weight="bold">Oⱼ</text>
+
+                                <!-- Distance r_j along Z_j -->
+                                <text x="169" y="128" fill="#c4b5fd" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">rⱼ</text>
+
+                                <!-- Parallel line to X_{j-1} passing through O_j -->
+                                <line x1="172" y1="90" x2="310" y2="53" stroke="#64748b" stroke-width="1.2" stroke-dasharray="3 3"/>
+
+                                <!-- Axis X_j rotated by theta_j around Z_j -->
+                                <line x1="172" y1="90" x2="285" y2="18" stroke="#a78bfa" stroke-width="2" marker-end="url(#arr-v)"/>
+                                <text x="290" y="22" fill="#c4b5fd" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold">Xⱼ</text>
+
+                                <!-- Right angle between Z_j and X_j -->
+                                <polyline points="166,77 179,69 185,82" fill="none" stroke="#94a3b8" stroke-width="1.2"/>
+
+                                <!-- Angle theta_j arc -->
+                                <path d="M 248 69 A 78 78 0 0 0 237 49" fill="none" stroke="#a78bfa" stroke-width="1.6" marker-end="url(#arr-v)"/>
+                                <text x="255" y="55" fill="#c4b5fd" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">θⱼ</text>
+
+                                <text x="65" y="234" fill="#94a3b8" font-family="Plus Jakarta Sans" font-size="12" font-weight="600">Figure 2 : Paramètres géométriques d'une structure ouverte simple.</text>
+                            </svg>
+                        </div>
+
+                        <div class="bg-slate-950/80 border border-violet-500/30 rounded-lg p-3 space-y-2 text-xs">
+                            <div class="flex flex-wrap justify-between gap-2 text-slate-200 font-mono">
+                                <span>• \(\sigma_j = 0\) : articulation <strong>rotoïde</strong></span>
+                                <span>• \(\sigma_j = 1\) : articulation <strong>prismatique</strong></span>
+                                <span>• \(\bar{\sigma}_j = 1 - \sigma_j\)</span>
+                            </div>
+                            <div class="text-center pt-1">
+                                $${^{j-1}T_j} = \text{Rot}(x, \alpha_j)\,\text{Trans}(x, d_j)\,\text{Rot}(z, \theta_j)\,\text{Trans}(z, r_j)$$
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Lorsqu'une cinématique comporte deux axes parallèles consécutifs (\(\alpha_{j+1} = 0\), c'est-à-dire \(Z_j \parallel Z_{j+1}\)), la transformation directe \({^{j-1}T_{j+1}} = {^{j-1}T_j}\,{^jT_{j+1}}\) s'écrit (coquilles typographiques de l'imprimé corrigées) :
+                        </p>
+                        <div class="bg-slate-950/80 border border-slate-800 rounded-lg p-2.5 overflow-x-auto text-[11px]">
+                            $${^{j-1}T_{j+1}} = \begin{bmatrix} c(\theta_j + \theta_{j+1}) & -s(\theta_j + \theta_{j+1}) & 0 & d_j + d_{j+1}c\theta_j \\ c\alpha_j s(\theta_j + \theta_{j+1}) & c\alpha_j c(\theta_j + \theta_{j+1}) & -s\alpha_j & d_{j+1}c\alpha_j s\theta_j - (r_j + r_{j+1})s\alpha_j \\ s\alpha_j s(\theta_j + \theta_{j+1}) & s\alpha_j c(\theta_j + \theta_{j+1}) & c\alpha_j & d_{j+1}s\alpha_j s\theta_j + (r_j + r_{j+1})c\alpha_j \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+                        </div>
+
+                        <div class="pt-1 border-t border-slate-800 text-xs text-slate-300">
+                            <strong class="text-cyan-300">3. Travail demandé — Partie 1 :</strong> Écrire une fonction MATLAB <code>Trans = MGD_gen(Sigma, A, Alpha, D, Theta)</code> calculant le MGD \({^0T_n}(q)\) d'un robot à chaîne simple ouverte quelconque.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: MATRIX EXPANSION & PARALLEL AXES PROOF -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="glass-card p-6 space-y-5">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <div class="flex items-center gap-2.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-violet-400"></span>
+                                <h3 class="font-display font-bold text-base sm:text-lg text-white">Développement Matriciel de \({^{j-1}T_j}\) &amp; Propriété des Axes Parallèles</h3>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-md bg-violet-500/15 text-violet-300 border border-violet-500/30 font-mono text-xs">Algèbre SE(3) • Page 2</span>
+                        </div>
+
+                        <div class="space-y-4 text-sm text-slate-300 leading-relaxed">
+                            <p>
+                                <strong>1. Produit des quatre transformations homogènes élémentaires :</strong><br/>
+                                Le passage du repère \(\mathcal{R}_{j-1}\) au repère \(\mathcal{R}_j\) se décompose en deux vissages élémentaires successifs : d'abord autour/le long de l'axe \(X_{j-1}\) (paramètres fixes \(\alpha_j, d_j\)), puis autour/le long de l'axe \(Z_j\) (paramètres \(\theta_j, r_j\)) :
+                            </p>
+
+                            <div class="bg-slate-950/85 border border-slate-800 rounded-xl p-3.5 overflow-x-auto text-xs">
+                                $${^{j-1}T_j} = \underbrace{\begin{bmatrix} 1 & 0 & 0 & d_j \\ 0 & c\alpha_j & -s\alpha_j & 0 \\ 0 & s\alpha_j & c\alpha_j & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}}_{\text{Rot}(x,\alpha_j)\cdot\text{Trans}(x,d_j)} \cdot \underbrace{\begin{bmatrix} c\theta_j & -s\theta_j & 0 & 0 \\ s\theta_j & c\theta_j & 0 & 0 \\ 0 & 0 & 1 & r_j \\ 0 & 0 & 0 & 1 \end{bmatrix}}_{\text{Rot}(z,\theta_j)\cdot\text{Trans}(z,r_j)}$$
+                            </div>
+
+                            <div class="bg-gradient-to-r from-blue-950/50 to-violet-950/50 border border-cyan-500/40 rounded-xl p-4 overflow-x-auto">
+                                <div class="text-xs font-mono uppercase text-cyan-300 mb-1.5 font-semibold">Matrice de Passage Générale \({^{j-1}T_j}\) (Forme Explicite \(4\times 4\))</div>
+                                $$\boxed{{^{j-1}T_j} = \begin{bmatrix} \cos\theta_j & -\sin\theta_j & 0 & d_j \\ \cos\alpha_j \sin\theta_j & \cos\alpha_j \cos\theta_j & -\sin\alpha_j & -r_j \sin\alpha_j \\ \sin\alpha_j \sin\theta_j & \sin\alpha_j \cos\theta_j & \cos\alpha_j & r_j \cos\alpha_j \\ 0 & 0 & 0 & 1 \end{bmatrix}}$$
+                            </div>
+
+                            <!-- Verification des colonnes -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 space-y-1.5">
+                                    <div class="font-mono text-cyan-400 font-semibold">Vérification de la 4<sup>ème</sup> colonne (Origine \(O_j\)) :</div>
+                                    <p class="text-slate-300 leading-relaxed">
+                                        Dans \(\mathcal{R}_{j-1}\), le vecteur \(\overrightarrow{O_{j-1}O_j} = d_j \vec{x}_{j-1} + r_j \vec{z}_j\). Comme \(\vec{z}_j = -\sin\alpha_j \vec{y}_{j-1} + \cos\alpha_j \vec{z}_{j-1}\), on retrouve exactement \(\begin{bmatrix} d_j & -r_j s\alpha_j & r_j c\alpha_j \end{bmatrix}^T\).
+                                    </p>
+                                </div>
+                                <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3.5 space-y-1.5">
+                                    <div class="font-mono text-violet-400 font-semibold">Propriété d'orthogonalité de la sous-matrice \(3\times 3\) :</div>
+                                    <p class="text-slate-300 leading-relaxed">
+                                        La sous-matrice de rotation \({^{j-1}R_j} = \text{Rot}(x,\alpha_j)\text{Rot}(z,\theta_j)\) appartient au groupe spécial orthogonal \(SO(3)\) : \(\det({^{j-1}R_j}) = +1\) et \({^{j-1}R_j}^{-1} = {^{j-1}R_j}^T\).
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- 2. Simplification pour axes parallèles -->
+                            <div class="bg-slate-900/75 border border-blue-500/30 rounded-xl p-4 space-y-3">
+                                <h4 class="font-display font-semibold text-sm text-cyan-300">
+                                    2. Simplification pour deux axes consécutifs parallèles (\(\alpha_{j+1} = 0\))
+                                </h4>
+                                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                                    Lorsque les axes articulaires \(Z_j\) et \(Z_{j+1}\) sont parallèles (comme pour un bras planaire RR ou les deux premiers axes d'un robot SCARA), l'angle de vrillage vaut \(\alpha_{j+1} = 0\). La matrice \({^jT_{j+1}}\) se réduit alors à :
+                                </p>
+                                <div class="bg-slate-950/85 rounded-lg p-3 overflow-x-auto text-xs">
+                                    $${^jT_{j+1}}\big|_{\alpha_{j+1}=0} = \begin{bmatrix} c\theta_{j+1} & -s\theta_{j+1} & 0 & d_{j+1} \\ s\theta_{j+1} & c\theta_{j+1} & 0 & 0 \\ 0 & 0 & 1 & r_{j+1} \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+                                </div>
+                                <p class="text-xs text-slate-300 leading-relaxed">
+                                    En multipliant à gauche par \({^{j-1}T_j}\) et en appliquant les identités trigonométriques \(c\theta_j c\theta_{j+1} - s\theta_j s\theta_{j+1} = \cos(\theta_j + \theta_{j+1})\) et \(s\theta_j c\theta_{j+1} + c\theta_j s\theta_{j+1} = \sin(\theta_j + \theta_{j+1})\), on voit apparaître directement la <strong>somme des angles \(\theta_j + \theta_{j+1}\)</strong> et la <strong>somme des décalages axiaux \(r_j + r_{j+1}\)</strong> dans l'expression de \({^{j-1}T_{j+1}}\).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             PAGE 3 : TRAVAIL DEMANDÉ — PARTIE 1 (MGD_gen) & PARTIE 2 (MGI_RR)
+        ==================================================================== -->
+        <section id="page-3" class="scroll-mt-20 space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-lg bg-cyan-600/20 border border-cyan-400/40 font-mono text-xs font-bold text-cyan-300">PAGE 3 / 3</span>
+                    <h2 class="font-display text-xl sm:text-2xl font-bold text-white">Travail Demandé : Partie 1 (<code>MGD_gen</code> &amp; Robot Cylindrique) &amp; Partie 2 (<code>MGI_RR</code>)</h2>
+                </div>
+                <span class="text-xs font-mono text-slate-400 hidden md:inline">USTHB / FGE • TP CRM • M1 AII • MENANI 3</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- LEFT COLUMN: FAITHFUL REPRODUCTION OF PAGE 3 HANDOUT -->
+                <div class="lg:col-span-5 handout-paper p-5 sm:p-6 space-y-5 lg:sticky lg:top-20">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <span class="text-[11px] font-mono uppercase tracking-wider text-cyan-400 font-semibold">Énoncé Original &amp; Figure 3 (Page 3)</span>
+                        <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono text-[10px]">Page 3</span>
+                    </div>
+
+                    <!-- Suite Partie 1 -->
+                    <div class="space-y-2.5 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        <div class="text-xs font-mono text-cyan-400 uppercase font-semibold">Suite — Partie 1 : Modèle géométrique direct d'un robot quelconque</div>
+                        <p>
+                            Écrire une fonction MATLAB appelée <code>Trans = MGD_gen(Sigma, A, Alpha, D, Theta)</code> qui :
+                        </p>
+                        <ol class="list-decimal list-inside space-y-1.5 text-xs sm:text-sm">
+                            <li>Calcule le MGD d'un robot (à chaîne simple ouverte) quelconque.</li>
+                            <li>Les entrées <code>A, Alpha, D, Theta</code> sont les vecteurs \(n\times 1\) des paramètres de Denavit-Hartenberg (DH) du robot (les unités de mesure sont mètres et radians).</li>
+                            <li>La sortie <code>Trans</code> est la matrice de transformation homogène \({^0T_n}(q)\) qui donne la pose de l'effecteur par rapport à sa base.</li>
+                        </ol>
+                        <div class="bg-slate-950/80 border border-blue-500/30 rounded-lg p-3 text-xs sm:text-sm text-slate-200">
+                            <strong>3)</strong> Tester la fonction <code>MGD_gen</code> sur : <strong>Le manipulateur cylindrique</strong> (\(d_1 = 0.4\text{ m}\)) pour les valeurs des variables articulaires suivantes :
+                            <div class="mt-1.5 font-mono text-cyan-300 text-center">
+                                \(q^{(1)} = [0,\ 0.25,\ 0.25]^T\) &nbsp;et&nbsp; \(q^{(2)} = [\pi/3,\ 0,\ 0.4]^T\)
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-800"/>
+
+                    <!-- Partie 2 Handout -->
+                    <div class="space-y-3 text-xs sm:text-sm text-slate-300 leading-relaxed">
+                        <h3 class="font-display font-bold text-sm text-violet-300 uppercase tracking-wider">Partie 2 : Modèle géométrique inverse d'un robot planaire à 2 DDL</h3>
+
+                        <!-- High-Precision Vector SVG of Figure 3: Robot planaire à 2DDL -->
+                        <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3">
+                            <svg viewBox="0 0 420 265" class="w-full h-auto">
+                                <defs>
+                                    <marker id="ax-p3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                        <path d="M 0 1 L 9 5 L 0 9 z" fill="#38bdf8"/>
+                                    </marker>
+                                    <marker id="ax-v3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                        <path d="M 0 1 L 9 5 L 0 9 z" fill="#a78bfa"/>
+                                    </marker>
+                                </defs>
+
+                                <!-- Ground Base -->
+                                <rect x="52" y="218" width="44" height="16" fill="#1e293b"/>
+                                <line x1="36" y1="218" x2="112" y2="218" stroke="#e2e8f0" stroke-width="2.2"/>
+                                <g stroke="#64748b" stroke-width="1.5">
+                                    <line x1="44" y1="218" x2="36" y2="229"/><line x1="58" y1="218" x2="50" y2="229"/>
+                                    <line x1="72" y1="218" x2="64" y2="229"/><line x1="86" y1="218" x2="78" y2="229"/>
+                                    <line x1="100" y1="218" x2="92" y2="229"/>
+                                </g>
+
+                                <!-- Base Pedestal -->
+                                <rect x="64" y="192" width="20" height="26" fill="#334155" stroke="#cbd5e1" stroke-width="1.4"/>
+
+                                <!-- Frame R0 (x0, y0) at O0 = (74, 192) -->
+                                <line x1="74" y1="192" x2="355" y2="192" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#ax-p3)"/>
+                                <text x="362" y="196" fill="#38bdf8" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">x₀</text>
+                                <line x1="74" y1="192" x2="74" y2="38" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#ax-p3)"/>
+                                <text x="68" y="28" fill="#38bdf8" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">y₀</text>
+
+                                <!-- Link 1: length a1 from (74,192) to (205, 132) [angle -24.6 deg] -->
+                                <g transform="translate(74, 192) rotate(-24.6)">
+                                    <rect x="0" y="-11" width="144" height="22" rx="11" fill="#131c33" stroke="#cbd5e1" stroke-width="1.6"/>
+                                    <line x1="0" y1="0" x2="144" y2="0" stroke="#64748b" stroke-width="1" stroke-dasharray="4 3"/>
+                                    <!-- Dimension a1 -->
+                                    <line x1="0" y1="-26" x2="144" y2="-26" stroke="#94a3b8" stroke-width="1.2" marker-start="url(#ax-p3)" marker-end="url(#ax-p3)"/>
+                                    <text x="64" y="-33" fill="#f8fafc" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">a₁</text>
+                                </g>
+
+                                <!-- Axis x1 extension & y1 -->
+                                <line x1="205" y1="132" x2="315" y2="82" stroke="#38bdf8" stroke-width="1.6" marker-end="url(#ax-p3)"/>
+                                <text x="320" y="83" fill="#38bdf8" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">x₁</text>
+                                <line x1="205" y1="132" x2="165" y2="45" stroke="#38bdf8" stroke-width="1.6" marker-end="url(#ax-p3)"/>
+                                <text x="150" y="46" fill="#38bdf8" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">y₁</text>
+
+                                <!-- Angle theta_1 arc -->
+                                <path d="M 152 192 A 78 78 0 0 0 145 160" fill="none" stroke="#38bdf8" stroke-width="1.6" marker-end="url(#ax-p3)"/>
+                                <text x="158" y="178" fill="#38bdf8" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">θ₁</text>
+
+                                <!-- Link 2: length a2 from (205,132) to P=(295, 32) [angle -48 deg] -->
+                                <g transform="translate(205, 132) rotate(-48)">
+                                    <rect x="0" y="-10" width="134" height="20" rx="10" fill="#131c33" stroke="#a78bfa" stroke-width="1.8"/>
+                                    <line x1="0" y1="0" x2="134" y2="0" stroke="#64748b" stroke-width="1" stroke-dasharray="4 3"/>
+                                    <!-- Dimension a2 -->
+                                    <line x1="0" y1="-25" x2="134" y2="-25" stroke="#c4b5fd" stroke-width="1.2" marker-start="url(#ax-v3)" marker-end="url(#ax-v3)"/>
+                                    <text x="58" y="-32" fill="#c4b5fd" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">a₂</text>
+                                </g>
+
+                                <!-- Frame R2 (x2, y2) at Point P = (295, 32) -->
+                                <line x1="295" y1="32" x2="345" y2="-23" stroke="#a78bfa" stroke-width="1.6"/>
+                                <line x1="295" y1="32" x2="338" y2="-15" stroke="#a78bfa" stroke-width="1.6" marker-end="url(#ax-v3)"/>
+                                <text x="344" y="14" fill="#c4b5fd" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">x₂</text>
+                                <line x1="295" y1="32" x2="232" y2="-24" stroke="#a78bfa" stroke-width="1.6"/>
+                                <line x1="295" y1="32" x2="245" y2="-12" stroke="#a78bfa" stroke-width="1.6" marker-end="url(#ax-v3)"/>
+                                <text x="226" y="12" fill="#c4b5fd" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">y₂</text>
+
+                                <!-- Angle theta_2 arc -->
+                                <path d="M 268 103 A 68 68 0 0 0 250 82" fill="none" stroke="#a78bfa" stroke-width="1.6" marker-end="url(#ax-v3)"/>
+                                <text x="271" y="88" fill="#c4b5fd" font-family="Plus Jakarta Sans" font-size="13" font-style="italic" font-weight="bold">θ₂</text>
+
+                                <!-- Joints O0, O1 and End-Effector P -->
+                                <circle cx="74" cy="192" r="14" fill="#0f172a" stroke="#cbd5e1" stroke-width="1.6"/>
+                                <circle cx="74" cy="192" r="5" fill="#38bdf8"/>
+
+                                <circle cx="205" cy="132" r="13" fill="#0f172a" stroke="#cbd5e1" stroke-width="1.6"/>
+                                <circle cx="205" cy="132" r="5" fill="#a78bfa"/>
+
+                                <circle cx="295" cy="32" r="5.5" fill="#f43f5e" stroke="#ffffff" stroke-width="1.2"/>
+                                <text x="305" y="37" fill="#f8fafc" font-family="Plus Jakarta Sans" font-size="13" font-weight="bold">P</text>
+
+                                <text x="125" y="255" fill="#94a3b8" font-family="Plus Jakarta Sans" font-size="12" font-weight="600">Figure 3 : Robot planaire à 2 DDL.</text>
+                            </svg>
+                        </div>
+
+                        <ol class="list-decimal list-inside space-y-2 text-xs sm:text-sm text-slate-200">
+                            <li>Déterminer le modèle géométrique direct du robot planaire (figure 3).</li>
+                            <li>Déterminer le vecteur des variables articulaires \(q\) permettant d'obtenir une situation désirée pour l'effecteur, ainsi que les équations mathématiques.</li>
+                            <li>Écrire une fonction MATLAB appelée <code>[theta1, theta2] = MGI_RR(px, py)</code> qui prend en entrée les coordonnées du point \(P\) et renvoie les variables articulaires du robot.</li>
+                            <li>Tester la fonction avec les valeurs numériques : \(a_1 = 0.61\text{ m}\), \(a_2 = 0.4\text{ m}\), \([\theta_1, \theta_2] = [0, 0]\), \([\pi/6, \pi/3]\) et \([\pi/4, \pi/4]\).</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: COMPLETE SOLUTIONS FOR PARTIE 1 & PARTIE 2 -->
+                <div class="lg:col-span-7 space-y-6">
+
+                    <!-- PARTIE 1 SOLUTION: MGD_gen & MANIPULATEUR CYLINDRIQUE -->
+                    <div class="glass-card p-6 space-y-5">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h3 class="font-display font-bold text-base sm:text-lg text-white">
+                                Partie 1 — Conception de <code>MGD_gen</code> &amp; Application au Manipulateur Cylindrique (3-DDL)
+                            </h3>
+                            <span class="px-2.5 py-0.5 rounded-md bg-blue-500/15 text-cyan-300 border border-cyan-500/30 font-mono text-xs">Partie 1 • Q1–Q3</span>
+                        </div>
+
+                        <div class="space-y-4 text-sm text-slate-300 leading-relaxed">
+                            <p>
+                                <strong>1. Correspondance des paramètres d'entrée de <code>MGD_gen(Sigma, A, Alpha, D, Theta)</code> :</strong><br/>
+                                Dans la littérature robotique francophone (Khalil-Kleinfinger / Dombre-Khalil), les paramètres géométriques sont notés \((\sigma_j, d_j, \alpha_j, r_j, \theta_j)\), tandis que dans la notation DH internationale de MATLAB (<em>Robotics System Toolbox</em>), la distance le long de \(X_{j-1}\) est appelée <code>a_j</code> (vecteur <code>A</code>) et le décalage le long de \(Z_j\) est appelé <code>d_j</code> (vecteur <code>D</code>). Ainsi :
+                            </p>
+
+                            <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 text-xs font-mono grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div>• <span class="text-cyan-300">Sigma(j)</span> = \(\sigma_j \in \{0, 1\}\) (type d'articulation)</div>
+                                <div>• <span class="text-cyan-300">A(j)</span> = \(d_j\) (longueur le long de \(X_{j-1}\))</div>
+                                <div>• <span class="text-violet-300">Alpha(j)</span> = \(\alpha_j\) (angle autour de \(X_{j-1}\))</div>
+                                <div>• <span class="text-violet-300">D(j)</span> = \(r_j\) (distance le long de \(Z_j\))</div>
+                                <div class="sm:col-span-2">• <span class="text-blue-300">Theta(j)</span> = \(\theta_j\) (angle autour de \(Z_j\))</div>
+                            </div>
+
+                            <!-- Schéma cinématique & tableau DH du manipulateur cylindrique -->
+                            <div class="bg-slate-900/75 border border-slate-800 rounded-xl p-4 space-y-3">
+                                <h4 class="font-display font-semibold text-sm text-cyan-300">
+                                    2. Modélisation Géométrique du Manipulateur Cylindrique 3-DDL (RPP)
+                                </h4>
+                                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                                    Un robot manipulateur cylindrique possède <strong>3 degrés de liberté</strong> de type <strong>RPP</strong> : une rotation verticale \(q_1 = \theta_1\) autour de l'axe vertical \(Z_1\) (avec hauteur de colonne \(d_1 = 0.4\text{ m}\)), une translation verticale \(q_2 = r_2\) le long de \(Z_2 \parallel Z_1\), et une translation radiale horizontale \(q_3 = r_3\) le long de \(Z_3 \perp Z_2\) (obtenue par une rotation \(\alpha_3 = -\pi/2\) autour de \(X_2\)) :
+                                </p>
+
+                                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                                    <!-- SVG Schematic of Cylindrical Robot -->
+                                    <div class="md:col-span-5 bg-slate-950/90 border border-slate-800 rounded-xl p-2.5">
+                                        <svg viewBox="0 0 240 220" class="w-full h-auto">
+                                            <!-- Base -->
+                                            <rect x="35" y="185" width="60" height="16" fill="#1e293b" stroke="#94a3b8"/>
+                                            <line x1="25" y1="201" x2="105" y2="201" stroke="#e2e8f0" stroke-width="2"/>
+                                            <!-- Vertical Column d1 + q2 -->
+                                            <rect x="57" y="65" width="16" height="120" fill="#131c33" stroke="#38bdf8" stroke-width="1.5"/>
+                                            <!-- Z0, Z1 Axis -->
+                                            <line x1="65" y1="185" x2="65" y2="25" stroke="#ef4444" stroke-width="2"/>
+                                            <text x="42" y="34" fill="#ef4444" font-size="11" font-weight="bold">Z₁,Z₂</text>
+                                            <!-- X0, X1 Axis -->
+                                            <line x1="65" y1="185" x2="135" y2="185" stroke="#3b82f6" stroke-width="2"/>
+                                            <text x="138" y="189" fill="#60a5fa" font-size="11" font-weight="bold">X₀</text>
+                                            <!-- Theta 1 arc -->
+                                            <path d="M 48 162 A 20 8 0 1 0 82 162" fill="none" stroke="#38bdf8" stroke-width="1.4"/>
+                                            <text x="86" y="165" fill="#38bdf8" font-size="11" font-weight="bold">q₁=θ₁</text>
+                                            <!-- d1 & q2 labels -->
+                                            <text x="18" y="140" fill="#cbd5e1" font-size="11">d₁=0.4</text>
+                                            <text x="18" y="95" fill="#38bdf8" font-size="11" font-weight="bold">q₂=r₂</text>
+                                            <!-- Prismatic Carriage -->
+                                            <rect x="48" y="65" width="34" height="24" rx="4" fill="#1e293b" stroke="#a78bfa" stroke-width="1.6"/>
+                                            <!-- Horizontal Arm q3 along Z3 -->
+                                            <rect x="82" y="72" width="115" height="10" fill="#334155" stroke="#a78bfa" stroke-width="1.5"/>
+                                            <line x1="82" y1="77" x2="215" y2="77" stroke="#ef4444" stroke-width="1.8"/>
+                                            <text x="200" y="68" fill="#ef4444" font-size="11" font-weight="bold">Z₃</text>
+                                            <text x="125" y="65" fill="#c4b5fd" font-size="11" font-weight="bold">q₃ = r₃</text>
+                                            <!-- End Effector -->
+                                            <circle cx="197" cy="77" r="4.5" fill="#f43f5e"/>
+                                            <text x="188" y="96" fill="#f8fafc" font-size="11" font-weight="bold">P</text>
+                                        </svg>
+                                    </div>
+
+                                    <!-- DH Table -->
+                                    <div class="md:col-span-7 overflow-x-auto">
+                                        <table class="w-full text-xs text-center border-collapse font-mono bg-slate-950/80 rounded-lg overflow-hidden">
+                                            <thead>
+                                                <tr class="bg-slate-900 border-b border-slate-700 text-cyan-300">
+                                                    <th class="py-2 px-2">\(j\)</th>
+                                                    <th class="py-2 px-2">\(\sigma_j\)</th>
+                                                    <th class="py-2 px-2">\(a_j (d_j)\)</th>
+                                                    <th class="py-2 px-2">\(\alpha_j\)</th>
+                                                    <th class="py-2 px-2">\(d_j (r_j)\)</th>
+                                                    <th class="py-2 px-2">\(\theta_j\)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-800 text-slate-200">
+                                                <tr>
+                                                    <td class="py-2 font-bold text-white">1</td>
+                                                    <td class="py-2 text-cyan-300">0 (R)</td>
+                                                    <td class="py-2">0</td>
+                                                    <td class="py-2">0</td>
+                                                    <td class="py-2 text-amber-300">\(d_1 = 0.4\)</td>
+                                                    <td class="py-2 text-cyan-300 font-bold">\(q_1\)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="py-2 font-bold text-white">2</td>
+                                                    <td class="py-2 text-violet-300">1 (P)</td>
+                                                    <td class="py-2">0</td>
+                                                    <td class="py-2">0</td>
+                                                    <td class="py-2 text-violet-300 font-bold">\(q_2\)</td>
+                                                    <td class="py-2">0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="py-2 font-bold text-white">3</td>
+                                                    <td class="py-2 text-violet-300">1 (P)</td>
+                                                    <td class="py-2">0</td>
+                                                    <td class="py-2">\(-\pi/2\)</td>
+                                                    <td class="py-2 text-violet-300 font-bold">\(q_3\)</td>
+                                                    <td class="py-2">0</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="mt-2.5 bg-slate-950/80 border border-slate-800 rounded-lg p-2.5 text-center">
+                                            $${^0T_3}(q) = {^0T_1}\,{^1T_2}\,{^2T_3} = \begin{bmatrix} \cos q_1 & 0 & -\sin q_1 & -q_3 \sin q_1 \\ \sin q_1 & 0 & \cos q_1 & q_3 \cos q_1 \\ 0 & -1 & 0 & d_1 + q_2 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Numerical Results for q^(1) and q^(2) -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-slate-950/90 border border-blue-500/35 rounded-xl p-4 space-y-2">
+                                    <div class="text-xs font-mono uppercase text-cyan-300 font-semibold">Test 1 : \(q^{(1)} = [0,\; 0.25,\; 0.25]^T\)</div>
+                                    <p class="text-[11px] text-slate-400">
+                                        Avec \(\cos(0)=1, \sin(0)=0, d_1=0.4\text{ m}, q_2=0.25\text{ m}, q_3=0.25\text{ m}\) :
+                                    </p>
+                                    <div class="overflow-x-auto text-xs">
+                                        $${^0T_3}\big(q^{(1)}\big) = \begin{bmatrix} 1 & 0 & 0 & 0 \\ 0 & 0 & 1 & 0.25 \\ 0 & -1 & 0 & 0.65 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+                                    </div>
+                                    <div class="text-[11px] font-mono text-cyan-200">
+                                        Position effecteur : \(P = [0,\; 0.25,\; 0.65]^T\text{ m}\)
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-950/90 border border-violet-500/35 rounded-xl p-4 space-y-2">
+                                    <div class="text-xs font-mono uppercase text-violet-300 font-semibold">Test 2 : \(q^{(2)} = [\pi/3,\; 0,\; 0.4]^T\)</div>
+                                    <p class="text-[11px] text-slate-400">
+                                        Avec \(\cos(\pi/3)=0.5, \sin(\pi/3)=\frac{\sqrt{3}}{2}\approx 0.8660, q_2=0, q_3=0.4\text{ m}\) :
+                                    </p>
+                                    <div class="overflow-x-auto text-xs">
+                                        $${^0T_3}\big(q^{(2)}\big) = \begin{bmatrix} 0.5 & 0 & -0.8660 & -0.3464 \\ 0.8660 & 0 & 0.5 & 0.2000 \\ 0 & -1 & 0 & 0.4000 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+                                    </div>
+                                    <div class="text-[11px] font-mono text-violet-200">
+                                        Position effecteur : \(P = [-0.3464,\; 0.2000,\; 0.4000]^T\text{ m}\)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PARTIE 2 SOLUTION: ROBOT PLANAIRE 2-DDL (MGD & MGI_RR) -->
+                    <div class="glass-card p-6 space-y-5">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <h3 class="font-display font-bold text-base sm:text-lg text-white">
+                                Partie 2 — Modèles Géométriques Direct (MGD) et Inverse (<code>MGI_RR</code>) du Robot Planaire 2-DDL
+                            </h3>
+                            <span class="px-2.5 py-0.5 rounded-md bg-violet-500/15 text-violet-300 border border-violet-500/30 font-mono text-xs">Partie 2 • Q1–Q4</span>
+                        </div>
+
+                        <div class="space-y-4 text-sm text-slate-300 leading-relaxed">
+                            <!-- Question 1: MGD -->
+                            <div class="space-y-2.5">
+                                <h4 class="font-display font-semibold text-cyan-300 text-sm uppercase tracking-wider">
+                                    1. Détermination du Modèle Géométrique Direct (MGD)
+                                </h4>
+                                <p class="text-xs sm:text-sm text-slate-300">
+                                    Le bras planaire de la Figure 3 comporte deux articulations rotoïdes d'axes parallèles \(Z_0 \parallel Z_1 \parallel Z_2\) (\(\alpha_1 = \alpha_2 = 0\)) et de longueurs de segments \(a_1\) et \(a_2\). En plaçant le repère \(\mathcal{R}_2(P, x_2, y_2)\) à l'extrémité \(P\) du second segment :
+                                </p>
+                                <div class="bg-slate-950/85 border border-slate-800 rounded-xl p-3.5 overflow-x-auto text-xs">
+                                    $${^0T_1} = \begin{bmatrix} c_1 & -s_1 & 0 & 0 \\ s_1 & c_1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}, \quad {^1T_2} = \begin{bmatrix} c_2 & -s_2 & 0 & a_1 \\ s_2 & c_2 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}, \quad {^2T_P} = \begin{bmatrix} 1 & 0 & 0 & a_2 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix}$$
+                                    $${^0T_P} = {^0T_1}\,{^1T_2}\,{^2T_P} = \begin{bmatrix} c_{12} & -s_{12} & 0 & a_1 c_1 + a_2 c_{12} \\ s_{12} & c_{12} & 0 & a_1 s_1 + a_2 s_{12} \\ 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \end{bmatrix} \implies \boxed{\text{MGD : } \begin{cases} p_x = a_1 \cos\theta_1 + a_2 \cos(\theta_1 + \theta_2) \\ p_y = a_1 \sin\theta_1 + a_2 \sin(\theta_1 + \theta_2) \end{cases}}$$
+                                </div>
+                            </div>
+
+                            <!-- Question 2: MGI Equations -->
+                            <div class="space-y-2.5">
+                                <h4 class="font-display font-semibold text-violet-300 text-sm uppercase tracking-wider">
+                                    2. Résolution Analytique du Modèle Géométrique Inverse (MGI)
+                                </h4>
+                                <p class="text-xs sm:text-sm text-slate-300">
+                                    Étant données les coordonnées désirées \((p_x, p_y)\) du point \(P\), on élève au carré et on additionne les deux équations du MGD pour isoler \(\theta_2\) :
+                                </p>
+                                <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-2 text-xs">
+                                    $$p_x^2 + p_y^2 = (a_1 c_1 + a_2 c_{12})^2 + (a_1 s_1 + a_2 s_{12})^2 = a_1^2 + a_2^2 + 2 a_1 a_2 \cos\theta_2$$
+                                    $$\implies \cos\theta_2 = c_2 = \frac{p_x^2 + p_y^2 - a_1^2 - a_2^2}{2 a_1 a_2}$$
+                                    <p class="text-slate-300">
+                                        Le point \(P(p_x, p_y)\) est accessible dans la couronne circulaire \(|a_1 - a_2| \le \sqrt{p_x^2 + p_y^2} \le a_1 + a_2\), ce qui garantit \(|c_2| \le 1\). On en déduit les deux configurations symétriques du coude (<strong>coude bas</strong> \(s_2 \ge 0\) et <strong>coude haut</strong> \(s_2 \le 0\)) :
+                                    </p>
+                                    $$\boxed{s_2 = \sin\theta_2 = \pm\sqrt{1 - c_2^2}, \qquad \theta_2 = \text{atan2}(s_2, c_2)}$$
+                                </div>
+
+                                <p class="text-xs sm:text-sm text-slate-300">
+                                    En développant \(c_{12} = c_1 c_2 - s_1 s_2\) et \(s_{12} = s_1 c_2 + c_1 s_2\), on résout le système linéaire \(2\times 2\) en \((c_1, s_1)\) :
+                                </p>
+                                <div class="bg-gradient-to-r from-violet-950/50 to-blue-950/50 border border-violet-500/40 rounded-xl p-3.5 text-xs">
+                                    $$\begin{cases} (a_1 + a_2 c_2)c_1 - (a_2 s_2)s_1 = p_x \\ (a_2 s_2)c_1 + (a_1 + a_2 c_2)s_1 = p_y \end{cases} \implies \boxed{\theta_1 = \text{atan2}(p_y, p_x) - \text{atan2}(a_2 \sin\theta_2,\; a_1 + a_2 \cos\theta_2)}$$
+                                </div>
+                            </div>
+
+                            <!-- Question 4: Numerical Verification Table -->
+                            <div class="space-y-2.5">
+                                <h4 class="font-display font-semibold text-cyan-300 text-sm uppercase tracking-wider">
+                                    4. Validation Numérique pour \(a_1 = 0.61\text{ m}\) et \(a_2 = 0.4\text{ m}\)
+                                </h4>
+                                <p class="text-xs text-slate-400">
+                                    On calcule d'abord les coordonnées opérationnelles \((p_x, p_y)\) via le MGD pour chacun des 3 couples articulaires tests, puis on applique <code>MGI_RR(px, py)</code> afin de vérifier la restitution exacte des angles :
+                                </p>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-xs text-left border-collapse font-mono bg-slate-950/85 rounded-xl overflow-hidden border border-slate-800">
+                                        <thead>
+                                            <tr class="bg-slate-900 border-b border-slate-700 text-cyan-300">
+                                                <th class="py-2.5 px-3">Test \([\theta_1, \theta_2]\)</th>
+                                                <th class="py-2.5 px-3">MGD \((p_x, p_y)\) [m]</th>
+                                                <th class="py-2.5 px-3">MGI Coude Bas (\(\theta_2 \ge 0\))</th>
+                                                <th class="py-2.5 px-3">MGI Coude Haut (\(\theta_2 \le 0\))</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-800 text-slate-200">
+                                            <tr>
+                                                <td class="py-2.5 px-3 text-white font-semibold">\([0,\; 0]\)</td>
+                                                <td class="py-2.5 px-3 text-cyan-300">\((1.0100,\; 0.0000)\)</td>
+                                                <td class="py-2.5 px-3 text-emerald-300">\([0.0000,\; 0.0000]\) rad</td>
+                                                <td class="py-2.5 px-3 text-slate-400">\([0.0000,\; 0.0000]\) (sing.)</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-2.5 px-3 text-white font-semibold">\([\pi/6,\; \pi/3]\)</td>
+                                                <td class="py-2.5 px-3 text-cyan-300">\((0.5283,\; 0.7050)\)</td>
+                                                <td class="py-2.5 px-3 text-emerald-300">\([0.5236,\; 1.0472]\) rad</td>
+                                                <td class="py-2.5 px-3 text-violet-300">\([1.3357,\; -1.0472]\) rad</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="py-2.5 px-3 text-white font-semibold">\([\pi/4,\; \pi/4]\)</td>
+                                                <td class="py-2.5 px-3 text-cyan-300">\((0.4313,\; 0.8313)\)</td>
+                                                <td class="py-2.5 px-3 text-emerald-300">\([0.7854,\; 0.7854]\) rad</td>
+                                                <td class="py-2.5 px-3 text-violet-300">\([1.4001,\; -0.7854]\) rad</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             INTERACTIVE DUAL-MODE KINEMATICS SIMULATOR (CYLINDRICAL & 2-DOF RR)
+        ==================================================================== -->
+        <section id="simulateur" class="scroll-mt-20 space-y-6 no-print">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-lg bg-gradient-to-r from-blue-600/30 to-violet-600/30 border border-cyan-400/50 font-mono text-xs font-bold text-cyan-300">LABORATOIRE INTERACTIF</span>
+                    <h2 class="font-display text-xl sm:text-2xl font-bold text-white">Simulateur Géométrique Temps Réel — MGD Cylindrique &amp; MGI Planaire 2-DDL</h2>
+                </div>
+
+                <!-- Mode Selector Tabs -->
+                <div class="flex items-center gap-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800">
+                    <button id="tab-cyl" onclick="switchSimMode('CYL')" class="nav-pill nav-pill-active px-3.5 py-1.5 rounded-lg text-xs font-semibold">
+                        Partie 1 : Manipulateur Cylindrique (MGD)
+                    </button>
+                    <button id="tab-rr" onclick="switchSimMode('RR')" class="nav-pill px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-300">
+                        Partie 2 : Robot Planaire 2-DDL (MGD &amp; MGI)
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODE 1: MANIPULATEUR CYLINDRIQUE (MGD) -->
+            <div id="panel-cyl" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-4 glass-card p-5 space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                        <span class="font-display font-bold text-sm text-cyan-300 uppercase tracking-wider">Variables Articulaires \(q\) (\(d_1 = 0.4\text{ m}\))</span>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs font-mono">
+                            <span class="text-slate-300">Rotation \(q_1 = \theta_1\) (deg) :</span>
+                            <span id="cyl-val-q1" class="text-cyan-400 font-bold">0° (0.000 rad)</span>
+                        </div>
+                        <input id="cyl-q1" type="range" min="-180" max="180" step="1" value="0" class="w-full" oninput="updateCylSim()">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs font-mono">
+                            <span class="text-slate-300">Élévation \(q_2 = r_2\) (m) :</span>
+                            <span id="cyl-val-q2" class="text-violet-400 font-bold">0.25 m</span>
+                        </div>
+                        <input id="cyl-q2" type="range" min="0" max="0.8" step="0.01" value="0.25" class="w-full" oninput="updateCylSim()">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs font-mono">
+                            <span class="text-slate-300">Extension radiale \(q_3 = r_3\) (m) :</span>
+                            <span id="cyl-val-q3" class="text-blue-400 font-bold">0.25 m</span>
+                        </div>
+                        <input id="cyl-q3" type="range" min="0.05" max="0.9" step="0.01" value="0.25" class="w-full" oninput="updateCylSim()">
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-800">
+                        <div class="text-xs font-mono uppercase text-slate-400 font-semibold">Configurations Tests du Polycopié :</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="setCylPreset(0, 0.25, 0.25)" class="nav-pill px-3 py-2 rounded-lg text-xs font-mono text-cyan-300 hover:border-cyan-400">
+                                q⁽¹⁾ = [0, 0.25, 0.25]ᵀ
+                            </button>
+                            <button onclick="setCylPreset(60, 0, 0.4)" class="nav-pill px-3 py-2 rounded-lg text-xs font-mono text-violet-300 hover:border-violet-400">
+                                q⁽²⁾ = [π/3, 0, 0.4]ᵀ
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/90 border border-cyan-500/30 rounded-xl p-3.5 space-y-1.5 font-mono text-xs">
+                        <div class="text-cyan-400 font-semibold uppercase text-[11px]">Matrice Homogène \({^0T_3}(q)\) en Temps Réel</div>
+                        <div id="cyl-matrix-readout" class="text-slate-200 leading-relaxed"></div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-8 glass-card p-4 space-y-3">
+                    <div class="flex items-center justify-between text-xs font-mono text-slate-300 px-1">
+                        <span class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                            Projection 3D Isométrique — Manipulateur Cylindrique RPP (\(d_1 = 0.4\text{ m}\))
+                        </span>
+                        <span id="cyl-pos-badge" class="text-cyan-300 font-semibold">P = [0.000, 0.250, 0.650]ᵀ m</span>
+                    </div>
+                    <div class="w-full h-[380px] bg-[#060911] rounded-xl border border-slate-800/90 overflow-hidden">
+                        <canvas id="cyl-canvas" class="w-full h-full block"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODE 2: ROBOT PLANAIRE 2-DDL (MGD & MGI_RR) -->
+            <div id="panel-rr" class="hidden grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-4 glass-card p-5 space-y-5">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                        <span class="font-display font-bold text-sm text-violet-300 uppercase tracking-wider">Cible Opérationnelle \(P(p_x, p_y)\)</span>
+                        <span class="text-[11px] font-mono text-slate-400">a₁=0.61m, a₂=0.4m</span>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs font-mono">
+                            <span class="text-slate-300">Coordonnée \(p_x\) (m) :</span>
+                            <span id="rr-val-px" class="text-cyan-400 font-bold">0.528 m</span>
+                        </div>
+                        <input id="rr-px" type="range" min="-1.05" max="1.05" step="0.005" value="0.5283" class="w-full" oninput="updateRRSim()">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs font-mono">
+                            <span class="text-slate-300">Coordonnée \(p_y\) (m) :</span>
+                            <span id="rr-val-py" class="text-violet-400 font-bold">0.705 m</span>
+                        </div>
+                        <input id="rr-py" type="range" min="-1.05" max="1.05" step="0.005" value="0.7050" class="w-full" oninput="updateRRSim()">
+                    </div>
+
+                    <div class="space-y-2 pt-2 border-t border-slate-800">
+                        <div class="text-xs font-mono uppercase text-slate-400 font-semibold">Tests Numériques de la Partie 2 (Q4) :</div>
+                        <div class="grid grid-cols-3 gap-1.5">
+                            <button onclick="setRRPresetAngles(0, 0)" class="nav-pill px-2 py-2 rounded-lg text-[11px] font-mono text-cyan-300 hover:border-cyan-400">
+                                [0, 0]
+                            </button>
+                            <button onclick="setRRPresetAngles(Math.PI/6, Math.PI/3)" class="nav-pill px-2 py-2 rounded-lg text-[11px] font-mono text-violet-300 hover:border-violet-400">
+                                [π/6, π/3]
+                            </button>
+                            <button onclick="setRRPresetAngles(Math.PI/4, Math.PI/4)" class="nav-pill px-2 py-2 rounded-lg text-[11px] font-mono text-blue-300 hover:border-blue-400">
+                                [π/4, π/4]
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="rr-status-box" class="bg-slate-950/90 border border-emerald-500/40 rounded-xl p-3.5 space-y-2 font-mono text-xs">
+                        <div class="flex justify-between items-center">
+                            <span class="text-emerald-300 font-semibold uppercase text-[11px]">Solutions MGI_RR(px, py)</span>
+                            <span id="rr-reach-badge" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px]">Accessible</span>
+                        </div>
+                        <div id="rr-solutions-readout" class="text-slate-200 space-y-1.5 leading-relaxed"></div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-8 glass-card p-4 space-y-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-300 px-1">
+                        <span class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-violet-400 animate-pulse"></span>
+                            Espace de Travail &amp; Double Posture MGI (Coude Bas vs Coude Haut)
+                        </span>
+                        <div class="flex items-center gap-3 text-[11px]">
+                            <span class="flex items-center gap-1 text-cyan-300"><span class="w-3 h-0.5 bg-cyan-400 inline-block"></span> Coude Bas (\(\theta_2 \ge 0\))</span>
+                            <span class="flex items-center gap-1 text-violet-300"><span class="w-3 h-0.5 bg-violet-400 inline-block"></span> Coude Haut (\(\theta_2 \le 0\))</span>
+                        </div>
+                    </div>
+                    <div class="w-full h-[380px] bg-[#060911] rounded-xl border border-slate-800/90 overflow-hidden">
+                        <canvas id="rr-canvas" class="w-full h-full block"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================
+             COMPLETE MATLAB SCRIPT & CONSOLE OUTPUT SECTION
+        ==================================================================== -->
+        <section id="matlab-script" class="scroll-mt-20 space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 rounded-lg bg-blue-600/20 border border-blue-400/40 font-mono text-xs font-bold text-cyan-300">CODE MATLAB COMPLET</span>
+                    <h2 class="font-display text-xl sm:text-2xl font-bold text-white">Fonctions <code>MGD_gen.m</code>, <code>MGI_RR.m</code> &amp; Script Principal (<code>TP2_CRM_Solution_Complete.m</code>)</h2>
+                </div>
+                <button onclick="copyMatlabCode()" id="btn-copy-matlab" class="btn-primary px-4 py-2 flex items-center gap-2 no-print">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    <span id="copy-btn-text">Copier le script MATLAB</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div class="lg:col-span-7 glass-card overflow-hidden">
+                    <div class="bg-slate-900/90 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                            <span class="ml-2 text-cyan-300 font-semibold">TP2_CRM_Solution_Complete.m</span>
+                        </div>
+                        <span class="text-slate-400">MATLAB R2023+</span>
+                    </div>
+                    <pre id="matlab-source" class="p-4 sm:p-5 text-xs font-mono text-slate-200 overflow-x-auto leading-relaxed max-h-[620px]"><code>% =========================================================================
+% USTHB - FGE - Departement d'Automatique (Master 1 AII)
+% Module : TP Commande du robot manipulateur (CRM) - Pr. MENANI
+% TP N° 2 : Programmation d'un modele geometrique direct et inverse
+% Realise par : Dahane Ahmed Lamine
+% =========================================================================
+clear; clc; close all;
+
+disp('===================================================================');
+disp('   TP N°02 CRM - MODELE GEOMETRIQUE DIRECT (MGD) ET INVERSE (MGI)   ');
+disp('===================================================================');
+
+%% ========================================================================
+%  PARTIE 1 : TEST DE LA FONCTION MGD_gen SUR LE MANIPULATEUR CYLINDRIQUE
+%  ========================================================================
+disp('--- PARTIE 1 : Manipulateur Cylindrique 3-DDL (d1 = 0.4 m) ---');
+
+% Parametres geometriques fixes du manipulateur cylindrique (RPP) :
+% Sigma = [0 (R); 1 (P); 1 (P)]
+Sigma_cyl = [0; 1; 1];
+A_cyl     = [0; 0; 0];          % Distances d_j le long de X_{j-1}
+Alpha_cyl = [0; 0; -pi/2];      % Angles alpha_j autour de X_{j-1}
+d1        = 0.4;                % Hauteur fixe de la base (en metres)
+
+% Configuration test 1 : q1 = [0; 0.25; 0.25]
+q_test1     = [0; 0.25; 0.25];
+D_test1     = [d1; q_test1(2); q_test1(3)];
+Theta_test1 = [q_test1(1); 0; 0];
+T03_test1   = MGD_gen(Sigma_cyl, A_cyl, Alpha_cyl, D_test1, Theta_test1);
+
+disp('1) Matrice 0_T_3 pour q = [0, 0.25, 0.25]^T :');
+disp(T03_test1);
+
+% Configuration test 2 : q2 = [pi/3; 0; 0.4]
+q_test2     = [pi/3; 0; 0.4];
+D_test2     = [d1; q_test2(2); q_test2(3)];
+Theta_test2 = [q_test2(1); 0; 0];
+T03_test2   = MGD_gen(Sigma_cyl, A_cyl, Alpha_cyl, D_test2, Theta_test2);
+
+disp('2) Matrice 0_T_3 pour q = [pi/3, 0, 0.4]^T :');
+disp(T03_test2);
+
+%% ========================================================================
+%  PARTIE 2 : VALIDATION DU MGD ET DE LA FONCTION MGI_RR (ROBOT 2 DDL)
+%  ========================================================================
+disp('--- PARTIE 2 : Robot Planaire 2-DDL (a1 = 0.61 m, a2 = 0.4 m) ---');
+
+a1 = 0.61;
+a2 = 0.4;
+
+% Trois configurations articulaires de test :
+tests_q = [ 0,     0;
+            pi/6,  pi/3;
+            pi/4,  pi/4 ];
+
+for k = 1:size(tests_q, 1)
+    th1_ref = tests_q(k, 1);
+    th2_ref = tests_q(k, 2);
+
+    % Calcul du MGD (coordonnees du point P) :
+    px = a1*cos(th1_ref) + a2*cos(th1_ref + th2_ref);
+    py = a1*sin(th1_ref) + a2*sin(th1_ref + th2_ref);
+
+    % Appel de la fonction MGI_RR(px, py) :
+    [th1_sol, th2_sol] = MGI_RR(px, py);
+
+    fprintf('\nTest %d : [theta1, theta2]_ref = [%.4f, %.4f] rad\n', k, th1_ref, th2_ref);
+    fprintf('  -> MGD : P = (px = %.4f m, py = %.4f m)\n', px, py);
+    fprintf('  -> MGI (Coude bas, th2 >= 0) : [%.4f, %.4f] rad\n', th1_sol(1), th2_sol(1));
+    fprintf('  -> MGI (Coude haut, th2 <= 0): [%.4f, %.4f] rad\n', th1_sol(2), th2_sol(2));
+end
+
+%% ========================================================================
+%  DEFINITIONS DES FONCTIONS LOCALES (A ENREGISTRER EN .m SEPARES SI BESOIN)
+%  ========================================================================
+
+function Trans = MGD_gen(Sigma, A, Alpha, D, Theta)
+    % MGD_gen : Calcule la matrice de transformation homogene 0_T_n(q)
+    % d'un robot a structure ouverte simple (convention Khalil-Kleinfinger).
+    % Entrees :
+    %   Sigma : vecteur (n x 1) -> 0 si rotoide, 1 si prismatique
+    %   A     : vecteur (n x 1) -> distance d_j le long de X_{j-1} (m)
+    %   Alpha : vecteur (n x 1) -> angle alpha_j autour de X_{j-1} (rad)
+    %   D     : vecteur (n x 1) -> distance r_j le long de Z_j (m)
+    %   Theta : vecteur (n x 1) -> angle theta_j autour de Z_j (rad)
+
+    n = length(Sigma);
+    Trans = eye(4);
+
+    for j = 1:n
+        al = Alpha(j);
+        d  = A(j);
+        th = Theta(j);
+        r  = D(j);
+
+        % Verification de coherence du type d'articulation Sigma(j)
+        if Sigma(j) ~= 0 && Sigma(j) ~= 1
+            error('Sigma(%d) doit valoir 0 (rotoide) ou 1 (prismatique).', j);
+        end
+
+        % Matrice elementaire {j-1}_T_j = Rot(x,al)*Trans(x,d)*Rot(z,th)*Trans(z,r)
+        T_j = [ cos(th),           -sin(th),            0,        d;
+                cos(al)*sin(th),    cos(al)*cos(th),   -sin(al), -r*sin(al);
+                sin(al)*sin(th),    sin(al)*cos(th),    cos(al),  r*cos(al);
+                0,                  0,                  0,        1 ];
+
+        Trans = Trans * T_j;
+    end
+end
+
+function [theta1, theta2] = MGI_RR(px, py)
+    % MGI_RR : Modele Geometrique Inverse du robot planaire a 2 DDL (RR)
+    % Entrees : px, py (coordonnees cartesiennes de l'effecteur P en m)
+    % Sorties : theta1, theta2 (vecteurs 2x1 : [coude_bas; coude_haut] en rad)
+
+    a1 = 0.61;
+    a2 = 0.4;
+
+    % Calcul de cos(theta2) par la loi des cosinus
+    c2 = (px^2 + py^2 - a1^2 - a2^2) / (2 * a1 * a2);
+
+    % Verification de l'accessibilite dans l'espace de travail
+    if abs(c2) > 1 + 1e-9
+        error('Point P(%.3f, %.3f) hors de l''espace de travail du robot.', px, py);
+    end
+    c2 = max(-1, min(1, c2)); % Saturation numerique de securite
+
+    % Deux solutions pour theta2 : coude bas (+s2) et coude haut (-s2)
+    s2_pos = sqrt(1 - c2^2);
+    s2_neg = -s2_pos;
+
+    th2_1 = atan2(s2_pos, c2);
+    th2_2 = atan2(s2_neg, c2);
+
+    % Calcul de theta1 associe a chaque posture
+    th1_1 = atan2(py, px) - atan2(a2 * s2_pos, a1 + a2 * c2);
+    th1_2 = atan2(py, px) - atan2(a2 * s2_neg, a1 + a2 * c2);
+
+    theta1 = [th1_1; th1_2];
+    theta2 = [th2_1; th2_2];
+end</code></pre>
+                </div>
+
+                <!-- Simulated MATLAB Console Output -->
+                <div class="lg:col-span-5 glass-card overflow-hidden flex flex-col">
+                    <div class="bg-slate-900/90 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between text-xs font-mono">
+                        <span class="text-violet-300 font-semibold">Command Window — Résultats MATLAB</span>
+                        <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 text-[10px]">Exécution Validée</span>
+                    </div>
+                    <pre class="p-4 sm:p-5 text-xs font-mono text-cyan-200/90 overflow-x-auto leading-relaxed flex-1 max-h-[620px]"><code>>> TP2_CRM_Solution_Complete
+===================================================================
+   TP N°02 CRM - MODELE GEOMETRIQUE DIRECT (MGD) ET INVERSE (MGI)   
+===================================================================
+--- PARTIE 1 : Manipulateur Cylindrique 3-DDL (d1 = 0.4 m) ---
+1) Matrice 0_T_3 pour q = [0, 0.25, 0.25]^T :
+    1.0000         0         0         0
+         0         0    1.0000    0.2500
+         0   -1.0000         0    0.6500
+         0         0         0    1.0000
+
+2) Matrice 0_T_3 pour q = [pi/3, 0, 0.4]^T :
+    0.5000         0   -0.8660   -0.3464
+    0.8660         0    0.5000    0.2000
+         0   -1.0000         0    0.4000
+         0         0         0    1.0000
+
+--- PARTIE 2 : Robot Planaire 2-DDL (a1 = 0.61 m, a2 = 0.4 m) ---
+
+Test 1 : [theta1, theta2]_ref = [0.0000, 0.0000] rad
+  -> MGD : P = (px = 1.0100 m, py = 0.0000 m)
+  -> MGI (Coude bas, th2 >= 0) : [0.0000, 0.0000] rad
+  -> MGI (Coude haut, th2 <= 0): [0.0000, 0.0000] rad
+
+Test 2 : [theta1, theta2]_ref = [0.5236, 1.0472] rad
+  -> MGD : P = (px = 0.5283 m, py = 0.7050 m)
+  -> MGI (Coude bas, th2 >= 0) : [0.5236, 1.0472] rad
+  -> MGI (Coude haut, th2 <= 0): [1.3357, -1.0472] rad
+
+Test 3 : [theta1, theta2]_ref = [0.7854, 0.7854] rad
+  -> MGD : P = (px = 0.4313 m, py = 0.8313 m)
+  -> MGI (Coude bas, th2 >= 0) : [0.7854, 0.7854] rad
+  -> MGI (Coude haut, th2 <= 0): [1.4001, -0.7854] rad</code></pre>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ACADEMIC FOOTER -->
+    <footer class="border-t border-slate-800/80 bg-[#05070f] mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 font-mono">
+            <div>
+                USTHB • Faculté de Génie Électrique • Département d'Automatique — Master 1 AII (Module TP CRM • Pr. MENANI)
+            </div>
+            <div class="text-slate-300">
+                Réalisé par <strong class="text-cyan-400">Dahane Ahmed Lamine</strong>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT: KATEX AUTO-RENDER & DUAL-MODE INTERACTIVE SIMULATOR -->
+    <script>
+        function copyMatlabCode() {
+            const codeText = document.getElementById('matlab-source').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const btnText = document.getElementById('copy-btn-text');
+            btnText.textContent = 'Copié dans le presse-papiers !';
+            setTimeout(() => {
+                btnText.textContent = 'Copier le script MATLAB';
+            }, 2200);
+        }
+
+        function switchSimMode(mode) {
+            const panelCyl = document.getElementById('panel-cyl');
+            const panelRR = document.getElementById('panel-rr');
+            const tabCyl = document.getElementById('tab-cyl');
+            const tabRR = document.getElementById('tab-rr');
+
+            if (mode === 'CYL') {
+                panelCyl.classList.remove('hidden');
+                panelCyl.classList.add('grid');
+                panelRR.classList.add('hidden');
+                panelRR.classList.remove('grid');
+                tabCyl.classList.add('nav-pill-active');
+                tabRR.classList.remove('nav-pill-active');
+                updateCylSim();
+            } else {
+                panelRR.classList.remove('hidden');
+                panelRR.classList.add('grid');
+                panelCyl.classList.add('hidden');
+                panelCyl.classList.remove('grid');
+                tabRR.classList.add('nav-pill-active');
+                tabCyl.classList.remove('nav-pill-active');
+                updateRRSim();
+            }
+        }
+
+        /* ===============================================================
+           MODE 1: CYLINDRICAL MANIPULATOR 3-DOF SIMULATOR (ISOMETRIC 3D)
+        ================================================================ */
+        function setCylPreset(deg1, q2, q3) {
+            document.getElementById('cyl-q1').value = deg1;
+            document.getElementById('cyl-q2').value = q2;
+            document.getElementById('cyl-q3').value = q3;
+            updateCylSim();
+        }
+
+        function updateCylSim() {
+            const canvas = document.getElementById('cyl-canvas');
+            if (!canvas || canvas.offsetParent === null) return;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const W = rect.width;
+            const H = rect.height;
+
+            const deg1 = parseFloat(document.getElementById('cyl-q1').value);
+            const q1 = deg1 * Math.PI / 180;
+            const q2 = parseFloat(document.getElementById('cyl-q2').value);
+            const q3 = parseFloat(document.getElementById('cyl-q3').value);
+            const d1 = 0.40;
+
+            document.getElementById('cyl-val-q1').textContent = `${deg1}° (${q1.toFixed(3)} rad)`;
+            document.getElementById('cyl-val-q2').textContent = `${q2.toFixed(2)} m`;
+            document.getElementById('cyl-val-q3').textContent = `${q3.toFixed(2)} m`;
+
+            const c1 = Math.cos(q1);
+            const s1 = Math.sin(q1);
+            const px = -q3 * s1;
+            const py = q3 * c1;
+            const pz = d1 + q2;
+
+            document.getElementById('cyl-pos-badge').textContent = `P = [${px.toFixed(3)}, ${py.toFixed(3)}, ${pz.toFixed(3)}]ᵀ m`;
+
+            document.getElementById('cyl-matrix-readout').innerHTML = `
+                <div>[ ${c1.toFixed(3)} ,  0.000 , ${(-s1).toFixed(3)} , ${px.toFixed(3)} ]</div>
+                <div>[ ${s1.toFixed(3)} ,  0.000 ,  ${c1.toFixed(3)} , ${py.toFixed(3)} ]</div>
+                <div>[  0.000 , -1.000 ,  0.000 , ${pz.toFixed(3)} ]</div>
+                <div>[  0.000 ,  0.000 ,  0.000 , 1.000 ]</div>
+            `;
+
+            // Clear & Isometric 3D Projection Helper: (x, y, z) -> (sx, sy)
+            ctx.fillStyle = '#060911';
+            ctx.fillRect(0, 0, W, H);
+
+            const cx = W * 0.50;
+            const cy = H * 0.72;
+            const sc = Math.min(W, H) * 0.34;
+
+            function iso(x, y, z) {
+                const angle = Math.PI / 6;
+                const sx = cx + (y - x) * Math.cos(angle) * sc;
+                const sy = cy + (x + y) * Math.sin(angle) * sc * 0.55 - z * sc;
+                return [sx, sy];
+            }
+
+            // Draw Base Grid on Z=0
+            ctx.strokeStyle = 'rgba(51, 65, 85, 0.32)';
+            ctx.lineWidth = 1;
+            for (let g = -0.8; g <= 0.81; g += 0.4) {
+                let [xA, yA] = iso(g, -0.8, 0);
+                let [xB, yB] = iso(g, 0.8, 0);
+                ctx.beginPath(); ctx.moveTo(xA, yA); ctx.lineTo(xB, yB); ctx.stroke();
+
+                [xA, yA] = iso(-0.8, g, 0);
+                [xB, yB] = iso(0.8, g, 0);
+                ctx.beginPath(); ctx.moveTo(xA, yA); ctx.lineTo(xB, yB); ctx.stroke();
+            }
+
+            // Base Reference Axes X0, Y0, Z0
+            const [ox, oy] = iso(0, 0, 0);
+            const [xx, xy] = iso(0.75, 0, 0);
+            const [yx, yy] = iso(0, 0.75, 0);
+            const [zx, zy] = iso(0, 0, 1.3);
+
+            drawIsoAxis(ctx, ox, oy, xx, xy, '#38bdf8', 'X₀');
+            drawIsoAxis(ctx, ox, oy, yx, yy, '#10b981', 'Y₀');
+            drawIsoAxis(ctx, ox, oy, zx, zy, '#f43f5e', 'Z₀');
+
+            // Cylindrical Workspace Ring at height pz
+            ctx.strokeStyle = 'rgba(139, 92, 246, 0.25)';
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            for (let a = 0; a <= 360; a += 10) {
+                const rad = a * Math.PI / 180;
+                const [rx, ry] = iso(-q3 * Math.sin(rad), q3 * Math.cos(rad), pz);
+                if (a === 0) ctx.moveTo(rx, ry); else ctx.lineTo(rx, ry);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Column d1 (fixed) & q2 (prismatic)
+            const [d1x, d1y] = iso(0, 0, d1);
+            const [pzx, pzy] = iso(0, 0, pz);
+            const [endx, endy] = iso(px, py, pz);
+            const [projx, projy] = iso(px, py, 0);
+
+            // Drop line from P to XY plane
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath(); ctx.moveTo(endx, endy); ctx.lineTo(projx, projy); ctx.lineTo(ox, oy); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Fixed base d1
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 10;
+            ctx.lineCap = 'round';
+            ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(d1x, d1y); ctx.stroke();
+
+            // Vertical prismatic lift q2
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 7;
+            ctx.beginPath(); ctx.moveTo(d1x, d1y); ctx.lineTo(pzx, pzy); ctx.stroke();
+
+            // Horizontal radial extension q3
+            ctx.strokeStyle = '#a78bfa';
+            ctx.lineWidth = 6;
+            ctx.beginPath(); ctx.moveTo(pzx, pzy); ctx.lineTo(endx, endy); ctx.stroke();
+
+            // Joints & End-Effector P
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.arc(pzx, pzy, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+            ctx.fillStyle = '#f43f5e';
+            ctx.beginPath(); ctx.arc(endx, endy, 6.5, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = '700 12px "JetBrains Mono"';
+            ctx.fillText('P', endx + 10, endy - 6);
+        }
+
+        function drawIsoAxis(ctx, x1, y1, x2, y2, color, label) {
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 1.6;
+            ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+            ctx.font = '600 11px "JetBrains Mono"';
+            ctx.fillText(label, x2 + 6, y2 + 4);
+        }
+
+        /* ===============================================================
+           MODE 2: PLANAR 2-DOF ROBOT SIMULATOR (MGD & MGI_RR)
+        ================================================================ */
+        function setRRPresetAngles(th1, th2) {
+            const a1 = 0.61;
+            const a2 = 0.40;
+            const px = a1 * Math.cos(th1) + a2 * Math.cos(th1 + th2);
+            const py = a1 * Math.sin(th1) + a2 * Math.sin(th1 + th2);
+            document.getElementById('rr-px').value = px.toFixed(4);
+            document.getElementById('rr-py').value = py.toFixed(4);
+            updateRRSim();
+        }
+
+        function updateRRSim() {
+            const canvas = document.getElementById('rr-canvas');
+            if (!canvas || canvas.offsetParent === null) return;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+            const W = rect.width;
+            const H = rect.height;
+
+            const a1 = 0.61;
+            const a2 = 0.40;
+            const px = parseFloat(document.getElementById('rr-px').value);
+            const py = parseFloat(document.getElementById('rr-py').value);
+
+            document.getElementById('rr-val-px').textContent = `${px.toFixed(4)} m`;
+            document.getElementById('rr-val-py').textContent = `${py.toFixed(4)} m`;
+
+            ctx.fillStyle = '#060911';
+            ctx.fillRect(0, 0, W, H);
+
+            const ox = W * 0.44;
+            const oy = H * 0.60;
+            const sc = Math.min(W, H) * 0.36;
+
+            // Grid
+            ctx.strokeStyle = 'rgba(51, 65, 85, 0.32)';
+            ctx.lineWidth = 1;
+            const step = sc * 0.25;
+            for (let x = ox % step; x < W; x += step) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+            }
+            for (let y = oy % step; y < H; y += step) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+            }
+
+            // Workspace Annulus (R_max = a1 + a2 = 1.01m, R_min = |a1 - a2| = 0.21m)
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.28)';
+            ctx.setLineDash([5, 4]);
+            ctx.beginPath(); ctx.arc(ox, oy, (a1 + a2) * sc, 0, Math.PI * 2); ctx.stroke();
+            ctx.beginPath(); ctx.arc(ox, oy, Math.abs(a1 - a2) * sc, 0, Math.PI * 2); ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Axes X0, Y0
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.45)';
+            ctx.lineWidth = 1.3;
+            ctx.beginPath(); ctx.moveTo(20, oy); ctx.lineTo(W - 20, oy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ox, H - 20); ctx.lineTo(ox, 20); ctx.stroke();
+
+            // Compute MGI_RR(px, py)
+            const r2 = px * px + py * py;
+            const c2Raw = (r2 - a1 * a1 - a2 * a2) / (2 * a1 * a2);
+            const reachable = Math.abs(c2Raw) <= 1.0001;
+
+            const statusBox = document.getElementById('rr-status-box');
+            const badge = document.getElementById('rr-reach-badge');
+            const readout = document.getElementById('rr-solutions-readout');
+
+            if (!reachable) {
+                statusBox.className = 'bg-rose-950/30 border border-rose-500/50 rounded-xl p-3.5 space-y-2 font-mono text-xs';
+                badge.className = 'px-2 py-0.5 rounded bg-rose-500/30 text-rose-200 text-[10px]';
+                badge.textContent = 'Hors d’atteinte';
+                readout.innerHTML = `
+                    <div class="text-rose-200">|cos(θ₂)| = ${Math.abs(c2Raw).toFixed(3)} &gt; 1</div>
+                    <div class="text-slate-300 text-[11px]">Distance ||P|| = ${Math.sqrt(r2).toFixed(3)} m hors de [${(a1-a2).toFixed(2)}, ${(a1+a2).toFixed(2)}] m.</div>
+                `;
+            } else {
+                const c2 = Math.max(-1, Math.min(1, c2Raw));
+                const s2Pos = Math.sqrt(Math.max(0, 1 - c2 * c2));
+                const s2Neg = -s2Pos;
+
+                // Solution 1: Elbow down (th2 >= 0)
+                const th2_1 = Math.atan2(s2Pos, c2);
+                const th1_1 = Math.atan2(py, px) - Math.atan2(a2 * s2Pos, a1 + a2 * c2);
+
+                // Solution 2: Elbow up (th2 <= 0)
+                const th2_2 = Math.atan2(s2Neg, c2);
+                const th1_2 = Math.atan2(py, px) - Math.atan2(a2 * s2Neg, a1 + a2 * c2);
+
+                statusBox.className = 'bg-slate-950/90 border border-emerald-500/40 rounded-xl p-3.5 space-y-2 font-mono text-xs';
+                badge.className = 'px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px]';
+                badge.textContent = 'Accessible';
+                readout.innerHTML = `
+                    <div class="text-cyan-300"><strong>Coude bas :</strong> θ₁=${th1_1.toFixed(4)} rad (${(th1_1*180/Math.PI).toFixed(1)}°), θ₂=${th2_1.toFixed(4)} rad (${(th2_1*180/Math.PI).toFixed(1)}°)</div>
+                    <div class="text-violet-300"><strong>Coude haut :</strong> θ₁=${th1_2.toFixed(4)} rad (${(th1_2*180/Math.PI).toFixed(1)}°), θ₂=${th2_2.toFixed(4)} rad (${(th2_2*180/Math.PI).toFixed(1)}°)</div>
+                `;
+
+                // Draw Elbow-Up Ghost Branch (Violet)
+                const e2x = ox + a1 * Math.cos(th1_2) * sc;
+                const e2y = oy - a1 * Math.sin(th1_2) * sc;
+                const pEndx = ox + px * sc;
+                const pEndy = oy - py * sc;
+
+                ctx.strokeStyle = 'rgba(167, 139, 250, 0.55)';
+                ctx.lineWidth = 5;
+                ctx.setLineDash([5, 4]);
+                ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(e2x, e2y); ctx.lineTo(pEndx, pEndy); ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#a78bfa';
+                ctx.beginPath(); ctx.arc(e2x, e2y, 5, 0, Math.PI * 2); ctx.fill();
+
+                // Draw Elbow-Down Primary Branch (Cyan)
+                const e1x = ox + a1 * Math.cos(th1_1) * sc;
+                const e1y = oy - a1 * Math.sin(th1_1) * sc;
+
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 7;
+                ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(e1x, e1y); ctx.stroke();
+
+                ctx.strokeStyle = '#60a5fa';
+                ctx.lineWidth = 5;
+                ctx.beginPath(); ctx.moveTo(e1x, e1y); ctx.lineTo(pEndx, pEndy); ctx.stroke();
+
+                ctx.fillStyle = '#0f172a';
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath(); ctx.arc(e1x, e1y, 6, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            }
+
+            // Base O0 & Target P
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.arc(ox, oy, 8, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+            const tx = ox + px * sc;
+            const ty = oy - py * sc;
+            ctx.fillStyle = '#f43f5e';
+            ctx.beginPath(); ctx.arc(tx, ty, 6.5, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = '700 12px "JetBrains Mono"';
+            ctx.fillText(`P(${px.toFixed(2)}, ${py.toFixed(2)})`, tx + 10, ty - 8);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '\\(', right: '\\)', display: false}
+                    ],
+                    throwOnError: false
+                });
+            }
+            updateCylSim();
+        });
+
+        window.addEventListener('resize', () => {
+            updateCylSim();
+            updateRRSim();
+        });
+    </script>
+</body>
+</html>
